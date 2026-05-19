@@ -1,0 +1,654 @@
+/* =============================================================
+   IC MakerLab — Landing Page Stylesheet
+   Design system sourced from Figma: GzVnnpdanMUthXkPRjCd35
+   Font: Poppins (local), background: #E8F0F0
+   Base design resolution: 1920 × 1080px
+   Scaling: clamp(min, X/1920*100vw, max) on proportional dimensions
+   ============================================================= */
+
+/* ── Local fonts ─────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Poppins';
+  src: url('assets/IC MakerLab Website/Element/Font/Poppin/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('assets/IC MakerLab Website/Element/Font/Poppin/Poppins-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('assets/IC MakerLab Website/Element/Font/Poppin/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('assets/IC MakerLab Website/Element/Font/Poppin/Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('assets/IC MakerLab Website/Element/Font/Poppin/Poppins-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Design tokens ───────────────────────────────────────────── */
+:root {
+  --bg:         #E8F0F0;
+  --blue:       #0A86FF;
+  --blue-dark:  #006CD6;
+  --green:      #17DA99;
+  --green-semi: rgba(23, 218, 153, 0.5);
+  --green-text: #097F58;
+  --yellow:     #F9D03D;
+  --text:       #131B20;
+  --text-mid:   #4D7187;
+  --text-blue:  #204B66;
+  --light:      #F2F5F8;
+  --light2:     #F5F8F9;
+  --header-h:   64px;
+  --font:       'Poppins', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+img, video { display: block; max-width: 100%; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+
+/* ── NAVBAR ──────────────────────────────────────────────────── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  height: var(--header-h);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+}
+.navbar__inner {
+  width: 100%;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 10.42vw, 200px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.navbar__logo { display: flex; align-items: center; gap: 10px; }
+.navbar__logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-blue);
+  letter-spacing: -0.01em;
+}
+
+/* ── HERO ────────────────────────────────────────────────────── */
+/* overflow:hidden clips the hero at viewport edges so the hero
+   content doesn't cause a page-level horizontal scrollbar.
+   min-width on hero__inner freezes the layout below 1280px. */
+.hero { overflow: hidden; }
+
+.hero__inner {
+  min-width: 1280px;
+  max-width: 1920px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(20px, 3.44vw, 66px);
+  padding-left: clamp(80px, 10.42vw, 200px);
+  height: min(clamp(360px, 32.14vw, 617px), calc(100vh - var(--header-h) - 100px));
+}
+
+/* ── Hero left column ── */
+.hero__left {
+  width: clamp(320px, 30.94vw, 594px);
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding-top: clamp(15px, 1.56vw, 30px);
+}
+
+.hero__main-box {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(50px, 6.2vw, 119px);
+  width: 100%;
+}
+
+.hero__top-group {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 2.4vw, 46px);
+}
+
+.hero__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Outer: semi-transparent green, wider — "ghost extension" to the right */
+.hero__title-outer {
+  background: var(--green-semi);
+  width: clamp(220px, 28.65vw, 550px);
+  border-radius: 5px 15px 5px 15px;
+}
+
+/* Inner: solid green, narrower — text overflows into outer creating dual-tone */
+.hero__title-inner {
+  background: var(--green);
+  width: clamp(195px, 17.97vw, 345px);
+  height: clamp(65px, 5.9vw, 113px);
+  border-radius: 5px 15px 15px 15px;
+  display: flex;
+  align-items: center;
+  padding-left: clamp(8px, 0.78vw, 15px);
+  overflow: visible;
+}
+
+.hero__title-text {
+  font-size: clamp(40px, 3.91vw, 75px);
+  font-weight: 800;
+  color: var(--light);
+  line-height: 1.2;
+  white-space: pre;
+}
+
+/* Subtitle */
+.hero__subtitle { display: flex; align-items: center; gap: 5px; }
+.hero__star {
+  width: clamp(26px, 2.29vw, 44px);
+  height: clamp(26px, 2.29vw, 44px);
+  flex-shrink: 0;
+}
+.hero__subtitle span {
+  font-size: clamp(20px, 2.29vw, 44px);
+  font-weight: 600;
+  color: var(--green-text);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* More detail button */
+.btn-more-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(6px, 0.52vw, 10px);
+  background: var(--yellow);
+  color: var(--light);
+  padding: clamp(6px, 0.52vw, 10px) clamp(16px, 1.56vw, 30px);
+  border-radius: 50px;
+  font-size: clamp(15px, 1.3vw, 25px);
+  font-weight: 600;
+  line-height: 1.2;
+  align-self: flex-start;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-more-detail:hover { background: #e8c020; transform: translateY(-2px); }
+.btn-more-detail__icon {
+  width: clamp(20px, 1.56vw, 30px);
+  height: clamp(20px, 1.56vw, 30px);
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.btn-more-detail:hover .btn-more-detail__icon { background: rgba(255, 255, 255, 0.5); }
+
+/* Login CTA */
+.login-cta {
+  position: relative;
+  cursor: pointer;
+}
+
+.login-cta__decos {
+  position: absolute;
+  right: clamp(30px, 3.125vw, 60px);
+  top: clamp(-30px, -2.19vw, -42px);
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+}
+.login-cta__bar {
+  display: block;
+  width: 11px;
+  height: clamp(18px, 1.56vw, 30px);
+  background: var(--light2);
+  border-radius: 100px;
+}
+.login-cta__star {
+  position: absolute;
+  right: -24px;
+  top: -20px;
+  transform: rotate(-13deg);
+  width: clamp(18px, 1.46vw, 28px);
+  height: clamp(18px, 1.46vw, 28px);
+}
+
+.login-cta__pill {
+  background: var(--blue);
+  border-radius: clamp(40px, 3.75vw, 72px);
+  height: clamp(85px, 7.81vw, 150px);
+  width: clamp(290px, 31.04vw, 596px);
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 0.83vw, 16px);
+  padding: 0 clamp(16px, 1.72vw, 33px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.login-cta:hover .login-cta__pill {
+  background: #0078e0;
+  box-shadow: 0 6px 24px rgba(10, 134, 255, 0.45);
+  transform: translateY(-2px);
+}
+.login-cta:focus-visible .login-cta__pill {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+
+.login-cta__num {
+  width: clamp(48px, 4.17vw, 80px);
+  height: clamp(48px, 4.17vw, 80px);
+  border-radius: 100px;
+  background: var(--blue-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.login-cta__num span {
+  font-size: clamp(30px, 2.97vw, 57px);
+  font-weight: 600;
+  color: var(--light2);
+  line-height: 1;
+}
+
+.login-cta__text { flex: 1; color: var(--light2); min-width: 0; }
+.login-cta__title {
+  font-size: clamp(17px, 1.875vw, 36px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.login-cta__sub {
+  font-size: clamp(11px, 1.09vw, 21px);
+  font-weight: 400;
+  line-height: 1.4;
+  margin-top: 3px;
+}
+
+.login-cta__arrow-wrap {
+  width: clamp(48px, 4.17vw, 80px);
+  height: clamp(48px, 4.17vw, 80px);
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.login-cta:hover .login-cta__arrow-wrap { background: rgba(255, 255, 255, 0.25); }
+.login-cta__arr-hover { display: none; }
+.login-cta:hover .login-cta__arr-default { display: none; }
+.login-cta:hover .login-cta__arr-hover   { display: block; }
+
+/* Deco arrows: absolute, right of main box */
+.hero__deco-arrows {
+  position: absolute;
+  left: clamp(280px, 28.13vw, 540px);
+  top: clamp(100px, 8.33vw, 160px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.04vw, 20px);
+  pointer-events: none;
+}
+.hero__deco-arrows img {
+  width: clamp(36px, 2.81vw, 54px);
+  flex-shrink: 0;
+  animation: arrowPulse 2s ease-in-out infinite;
+}
+.hero__deco-arrows img:nth-child(2) { animation-delay: 0.15s; }
+.hero__deco-arrows img:nth-child(3) { animation-delay: 0.30s; }
+.hero__deco-arrows img:nth-child(4) { animation-delay: 0.45s; }
+@keyframes arrowPulse {
+  0%, 100% { opacity: 0.7; transform: translateY(0); }
+  50%       { opacity: 1;   transform: translateY(4px); }
+}
+
+/* Hero right: video */
+.hero__right {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+.hero__video {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* ── MACHINE TYPE NAV ────────────────────────────────────────── */
+.machine-nav {
+  background: linear-gradient(
+    to bottom,
+    #C0D7FA 0%,
+    rgba(212, 228, 243, 0.9) 80%,
+    rgba(232, 240, 236, 0) 100%
+  );
+  border-radius: 50px 50px 0 0;
+}
+
+.machine-nav__inner {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: clamp(25px, 1.82vw, 35px) clamp(24px, 10.42vw, 200px) clamp(60px, 5.21vw, 100px);
+}
+
+.machine-nav__header { margin-bottom: clamp(10px, 0.78vw, 15px); }
+.machine-nav__title {
+  font-size: clamp(26px, 2.29vw, 44px);
+  font-weight: 600;
+  color: var(--text-mid);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.machine-nav__sub {
+  font-size: clamp(15px, 1.3vw, 25px);
+  font-weight: 400;
+  color: var(--text-mid);
+  line-height: 1.4;
+}
+
+/* ── Machine tabs ── */
+.machine-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(24px, 5.63vw, 108px);
+  padding: 0 clamp(8px, 2.29vw, 44px);
+}
+
+/* Tab: no padding-top — the ::before gradient fills the tab area behind content */
+.machine-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 0.78vw, 15px);
+  width: clamp(120px, 10.42vw, 200px);
+  cursor: pointer;
+  position: relative;
+  padding: clamp(12px, 1.25vw, 24px) 0 clamp(10px, 0.83vw, 16px);
+  background: none;
+  border: none;
+}
+
+/* Gradient selector: fills full tab height, centered, wider than tab width */
+.machine-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(160px, 15vw, 288px);
+  border-radius: 50px 50px 0 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(116, 153, 191, 0.9) 57.604%,
+    rgba(116, 153, 191, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.machine-tab.is-active::before,
+.machine-tab:hover::before { opacity: 1; }
+
+/* Icon container: images bottom-aligned so all icons share a common baseline */
+.machine-tab__img-wrap {
+  width: 100%;
+  height: clamp(90px, 7.66vw, 147px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.machine-tab__img-wrap img {
+  max-height: 85%;
+  width: auto;
+  max-width: 90%;
+  object-fit: contain;
+  transition: transform 0.2s;
+}
+.machine-tab:hover .machine-tab__img-wrap img { transform: translateY(-4px); }
+
+/* Label */
+.machine-tab span {
+  font-size: clamp(14px, 1.25vw, 24px);
+  font-weight: 600;
+  color: var(--text-mid);
+  text-align: center;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+  transition: color 0.2s;
+}
+.machine-tab.is-active span { color: var(--light2); font-weight: 700; }
+.machine-tab:not(.is-active):hover span { color: var(--blue); }
+
+/* ── MACHINE DETAIL LIST ─────────────────────────────────────── */
+.machine-list {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: clamp(40px, 3.125vw, 60px) clamp(24px, 10.42vw, 200px) clamp(50px, 4.17vw, 80px);
+}
+
+.machine-section {
+  margin-bottom: clamp(40px, 3.91vw, 75px);
+  scroll-margin-top: calc(var(--header-h) + 20px);
+}
+.machine-section:last-child { margin-bottom: 0; }
+
+.machine-section__inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2.24vw, 43px);
+}
+
+.machine-section__hd { display: flex; align-items: center; gap: clamp(5px, 0.42vw, 8px); }
+.machine-section__icon {
+  height: clamp(50px, 4.48vw, 86px);
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.machine-section__meta { display: flex; flex-direction: column; gap: 2px; }
+.machine-section__title-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.2vw, 23px);
+  flex-wrap: wrap;
+}
+.machine-section__name {
+  font-size: clamp(20px, 1.875vw, 36px);
+  font-weight: 600;
+  color: var(--text-blue);
+  line-height: 1.2;
+}
+.machine-section__desc {
+  font-size: clamp(14px, 1.3vw, 25px);
+  font-weight: 400;
+  color: var(--text-blue);
+  line-height: 1.4;
+}
+
+.badge-training {
+  display: inline-flex;
+  align-items: center;
+  background: var(--yellow);
+  color: #ffffff;
+  font-size: clamp(11px, 0.83vw, 16px);
+  font-weight: 400;
+  padding: 5px 10px;
+  border-radius: 35px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* ── Machine card grids ── */
+
+/* 2-column (3D Printer): always exactly 2 equal columns, stacks at narrow viewports */
+.machine-cards--two {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(14px, 1.25vw, 24px);
+}
+
+/* 1-machine sections: card fills left half, empty right half */
+.machine-cards--one {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(14px, 1.25vw, 24px);
+}
+.machine-cards--one .machine-card { grid-column: 1 / 2; }
+
+/* ── Machine card ── */
+/* aspect-ratio 735:477 from Figma — consistent across all machine types */
+.machine-card {
+  background: var(--blue);
+  border-radius: clamp(25px, 2.6vw, 50px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 735 / 477;
+  transition: box-shadow 0.25s, transform 0.2s;
+}
+.machine-card:hover {
+  box-shadow: 0 10px 40px rgba(10, 134, 255, 0.35);
+  transform: translateY(-4px);
+}
+
+/* Photo: absolute fill of the flexible top area */
+.machine-card__photo-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+.machine-card__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+.machine-card:hover .machine-card__photo { transform: scale(1.03); }
+
+/* Info panel: always at card bottom */
+.machine-card__info { flex-shrink: 0; }
+
+.machine-card__name-bar {
+  background: var(--bg);
+  padding: clamp(8px, 0.99vw, 19px) clamp(14px, 1.46vw, 28px);
+  border-radius: clamp(22px, 2.45vw, 47px) clamp(22px, 2.45vw, 47px) 0 0;
+  font-size: clamp(14px, 1.46vw, 28px);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.machine-card__detail-bar {
+  background: var(--blue);
+  padding: clamp(5px, 0.42vw, 8px) clamp(14px, 1.72vw, 33px) clamp(7px, 0.73vw, 14px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: clamp(44px, 4.17vw, 80px);
+}
+
+.machine-card__tags { display: flex; flex-wrap: wrap; gap: clamp(5px, 0.52vw, 10px); }
+.mtag {
+  background: var(--bg);
+  color: var(--text);
+  font-size: clamp(10px, 0.83vw, 16px);
+  font-weight: 600;
+  padding: clamp(3px, 0.31vw, 6px) clamp(10px, 1.09vw, 21px);
+  border-radius: 97px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.machine-card__price {
+  color: var(--bg);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.price-val  { font-size: clamp(20px, 2.19vw, 42px); line-height: 1; }
+.price-unit { font-size: clamp(14px, 1.46vw, 28px); line-height: 1; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+/* Tablet: single-machine cards go full width */
+@media (max-width: 1100px) {
+  .machine-cards--one {
+    grid-template-columns: 1fr;
+  }
+  .machine-cards--one .machine-card {
+    grid-column: auto;
+    max-width: 600px;
+  }
+}
+
+/* Small: all cards single-column, tabs wrap */
+@media (max-width: 700px) {
+  .machine-cards--two,
+  .machine-cards--one {
+    grid-template-columns: 1fr;
+  }
+  .machine-cards--one .machine-card {
+    max-width: 100%;
+  }
+  .machine-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

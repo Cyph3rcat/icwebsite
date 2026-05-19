@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IC MakerLab – Booking</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <header class="navbar">
+    <div class="navbar__inner">
+      <div class="navbar__logo">
+        <!---<span class="navbar__logo-text">IC MakerLab</span> -->
+      </div>
+      <!-- SSO nav slot: reserved for login button -->
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="hero__inner">
+
+      <div class="hero__left">
+
+        <!-- Main content box: title group + login CTA -->
+        <div class="hero__main-box">
+
+          <!-- Top group: title+subtitle + More detail button -->
+          <div class="hero__top-group">
+
+            <!-- Title + subtitle -->
+            <div class="hero__title-group">
+              <!-- Outer frame: semi-transparent green extends right -->
+              <div class="hero__title-outer">
+                <!-- Inner frame: solid green, narrower, holds text -->
+                <div class="hero__title-inner">
+                  <span class="hero__title-text">Booking&nbsp;&nbsp;Lab</span>
+                </div>
+              </div>
+              <!-- Subtitle -->
+              <div class="hero__subtitle">
+                <img
+                  src="assets/IC MakerLab Website/Element/Icon/Suggest/Main Page Flow/Deco_star.svg"
+                  alt=""
+                  class="hero__star"
+                  width="44"
+                  height="44"
+                  aria-hidden="true"
+                >
+                <span>Powered IE Maker Lab</span>
+              </div>
+            </div>
+
+            <!-- More detail button -->
+            <button class="btn-more-detail" id="btn-more-detail">
+              <span>More detail</span>
+              <span class="btn-more-detail__icon" aria-hidden="true">
+                <img
+                  src="assets/IC MakerLab Website/Element/Icon/Arrow/More_detail.svg"
+                  alt=""
+                  width="10"
+                  height="15"
+                >
+              </span>
+            </button>
+
+          </div><!-- /.hero__top-group -->
+
+          <!-- Login / SSO CTA -->
+          <div class="login-cta" id="sso-placeholder" role="button" tabindex="0"
+               aria-label="Login Now to book">
+            <!-- Decorative elements above the pill -->
+            <div class="login-cta__decos" aria-hidden="true">
+              <span class="login-cta__bar"></span>
+              <span class="login-cta__bar"></span>
+              <img
+                src="assets/IC MakerLab Website/Element/Icon/Suggest/Main Page Flow/Deco_star.svg"
+                alt=""
+                class="login-cta__star"
+                width="28"
+                height="28"
+              >
+            </div>
+            <!-- Pill body -->
+            <div class="login-cta__pill">
+              <div class="login-cta__num" aria-hidden="true">
+                <span>1</span>
+              </div>
+              <div class="login-cta__text">
+                <p class="login-cta__title">Login Now to book</p>
+                <p class="login-cta__sub">Click here, Login and explore</p>
+              </div>
+              <div class="login-cta__arrow-wrap" aria-hidden="true">
+                <img
+                  src="assets/IC MakerLab Website/Element/Icon/Arrow/Main _step_default.svg"
+                  alt=""
+                  class="login-cta__arr-default"
+                  width="22"
+                  height="36"
+                >
+                <img
+                  src="assets/IC MakerLab Website/Element/Icon/Arrow/Main _step_hover.svg"
+                  alt=""
+                  class="login-cta__arr-hover"
+                  width="22"
+                  height="36"
+                >
+              </div>
+            </div>
+          </div><!-- /.login-cta -->
+
+        </div><!-- /.hero__main-box -->
+
+        <!-- Deco arrows: vertical column, positioned absolute to right of main box -->
+        <div class="hero__deco-arrows" aria-hidden="true">
+          <img src="assets/IC MakerLab Website/Element/Icon/Deco/Deco.svg" alt="" width="54">
+          <img src="assets/IC MakerLab Website/Element/Icon/Deco/Deco.svg" alt="" width="54">
+          <img src="assets/IC MakerLab Website/Element/Icon/Deco/Deco.svg" alt="" width="54">
+          <img src="assets/IC MakerLab Website/Element/Icon/Deco/Deco.svg" alt="" width="54">
+        </div>
+
+      </div><!-- /.hero__left -->
+
+      <!-- Right column: animation video -->
+      <div class="hero__right">
+        <video
+          class="hero__video"
+          autoplay
+          loop
+          muted
+          playsinline
+          aria-hidden="true"
+        >
+          <source
+            src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/notLogin_Animation/video_dynamicinfo_1.webm"
+            type="video/webm"
+          >
+        </video>
+      </div>
+
+    </div><!-- /.hero__inner -->
+  </section>
+
+  <!-- ===================== MACHINE TYPE NAV ===================== -->
+  <section class="machine-nav" id="machines">
+    <div class="machine-nav__inner">
+      <div class="machine-nav__header">
+        <h2 class="machine-nav__title">Machine Type</h2>
+        <p class="machine-nav__sub">Type of machine available in IE maker Lab</p>
+      </div>
+      <div class="machine-tabs" role="tablist" aria-label="Machine types">
+
+        <button class="machine-tab is-active" role="tab" data-target="printer" aria-selected="true">
+          <div class="machine-tab__img-wrap">
+            <img
+              src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/Logined_Animation/AE Raw Document/(Footage)/3D_printer_logo.png"
+              alt="3D Printer icon"
+            >
+          </div>
+          <span>3D Printer</span>
+        </button>
+
+        <button class="machine-tab" role="tab" data-target="laser" aria-selected="false">
+          <div class="machine-tab__img-wrap">
+            <img
+              src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/Logined_Animation/AE Raw Document/(Footage)/Lasercuter_logo.png"
+              alt="Laser Cutter icon"
+            >
+          </div>
+          <span>Laser Cuter</span>
+        </button>
+
+        <button class="machine-tab" role="tab" data-target="uv" aria-selected="false">
+          <div class="machine-tab__img-wrap">
+            <img
+              src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/Logined_Animation/AE Raw Document/(Footage)/UVPrinter_logo.png"
+              alt="UV Printer icon"
+            >
+          </div>
+          <span>UV Printer</span>
+        </button>
+
+        <button class="machine-tab" role="tab" data-target="scanner" aria-selected="false">
+          <div class="machine-tab__img-wrap">
+            <img
+              src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/Logined_Animation/AE Raw Document/(Footage)/3DScanner_logo.png"
+              alt="3D Scanner icon"
+            >
+          </div>
+          <span>3D Scanner</span>
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MACHINE DETAIL SECTIONS ===================== -->
+  <main class="machine-list" id="machine-list">
+
+    <!-- 3D Printer ─────────────────────────────────── -->
+    <section class="machine-section" id="printer" aria-labelledby="printer-title">
+      <div class="machine-section__inner">
+        <div class="machine-section__hd">
+          <img
+            src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/Logined_Animation/AE Raw Document/(Footage)/3D_printer_logo.png"
+            alt=""
+            class="machine-section__icon"
+            aria-hidden="true"
+          >
+          <div class="machine-section__meta">
+            <div class="machine-section__title-row">
+              <h2 class="machine-section__name" id="printer-title">3D Printer</h2>
+              <span class="badge-training">Training Required ⓘ</span>
+            </div>
+            <p class="machine-section__desc">Print physical model</p>
+          </div>
+        </div>
+        <!-- 2 cards — wraps on narrow viewports -->
+        <div class="machine-cards machine-cards--two">
+          <div class="machine-card">
+            <div class="machine-card__photo-wrap">
+              <img
+                src="assets/IC MakerLab Website/Photograhpic/Homepage Machine Icon/BambuX1_Carbon1.jpg"
+                alt="Bambu X1 Carbon"
+                class="machine-card__photo"
+              >
+            </div>
+            <div class="machine-card__info">
+              <div class="machine-card__name-bar">Bambu X1 Carbon</div>
+              <div class="machine-card__detail-bar">
+                <div class="machine-card__tags">
+                  <span class="mtag">Fast</span>
+                  <span class="mtag">Multi-colour</span>
+                  <span class="mtag">High-quality</span>
+                </div>
+                <div class="machine-card__price">
+                  <span class="price-val">$0.2</span><span class="price-unit">/g</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="machine-card">
+            <div class="machine-card__photo-wrap">
+              <img
+                src="assets/IC MakerLab Website/Photograhpic/Homepage Machine Icon/Creality_K1_Max1.jpg"
+                alt="Creality K1 Max"
+                class="machine-card__photo"
+              >
+            </div>
+            <div class="machine-card__info">
+              <div class="machine-card__name-bar">Creality K1 Max</div>
+              <div class="machine-card__detail-bar">
+                <div class="machine-card__tags">
+                  <span class="mtag">Fast</span>
+                  <span class="mtag">Multi-colour</span>
+                  <span class="mtag">High-quality</span>
+                </div>
+                <div class="machine-card__price">
+                  <span class="price-val">$0.2</span><span class="price-unit">/g</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Laser Cutter ─────────────────────────────────── -->
+    <section class="machine-section" id="laser" aria-labelledby="laser-title">
+      <div class="machine-section__inner">
+        <div class="machine-section__hd">
+          <img
+            src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/Logined_Animation/AE Raw Document/(Footage)/Lasercuter_logo.png"
+            alt=""
+            class="machine-section__icon"
+            aria-hidden="true"
+          >
+          <div class="machine-section__meta">
+            <div class="machine-section__title-row">
+              <h2 class="machine-section__name" id="laser-title">Laser cutter</h2>
+              <span class="badge-training">Training Required ⓘ</span>
+            </div>
+            <p class="machine-section__desc">Cut, engrave, or mark various materials</p>
+          </div>
+        </div>
+        <div class="machine-cards machine-cards--one">
+          <div class="machine-card">
+            <div class="machine-card__photo-wrap">
+              <img
+                src="assets/IC MakerLab Website/Photograhpic/Homepage Machine Icon/Hybrid_DualLaser2.jpg"
+                alt="Hybrid DualLaser"
+                class="machine-card__photo"
+              >
+            </div>
+            <div class="machine-card__info">
+              <div class="machine-card__name-bar">Hybrid DualLaser</div>
+              <div class="machine-card__detail-bar">
+                <div class="machine-card__tags">
+                  <span class="mtag">Fast</span>
+                  <span class="mtag">Multi-colour</span>
+                  <span class="mtag">High-quality</span>
+                </div>
+                <div class="machine-card__price">
+                  <span class="price-val">Free</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UV Printer ─────────────────────────────────── -->
+    <section class="machine-section" id="uv" aria-labelledby="uv-title">
+      <div class="machine-section__inner">
+        <div class="machine-section__hd">
+          <img
+            src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/Logined_Animation/AE Raw Document/(Footage)/UVPrinter_logo.png"
+            alt=""
+            class="machine-section__icon"
+            aria-hidden="true"
+          >
+          <div class="machine-section__meta">
+            <div class="machine-section__title-row">
+              <h2 class="machine-section__name" id="uv-title">UV Printer</h2>
+              <span class="badge-training">Training Required ⓘ</span>
+            </div>
+            <p class="machine-section__desc">Cure special inks onto materials</p>
+          </div>
+        </div>
+        <div class="machine-cards machine-cards--one">
+          <div class="machine-card">
+            <div class="machine-card__photo-wrap">
+              <img
+                src="assets/IC MakerLab Website/Photograhpic/Homepage Machine Icon/Roland_VersaUV1.jpg"
+                alt="Roland VersaUV"
+                class="machine-card__photo"
+              >
+            </div>
+            <div class="machine-card__info">
+              <div class="machine-card__name-bar">Roland VersaUV</div>
+              <div class="machine-card__detail-bar">
+                <div class="machine-card__tags">
+                  <span class="mtag">Fast</span>
+                  <span class="mtag">Multi-colour</span>
+                  <span class="mtag">High-quality</span>
+                </div>
+                <div class="machine-card__price">
+                  <span class="price-val">Free</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3D Scanner ─────────────────────────────────── -->
+    <section class="machine-section" id="scanner" aria-labelledby="scanner-title">
+      <div class="machine-section__inner">
+        <div class="machine-section__hd">
+          <img
+            src="assets/IC MakerLab Website/Element/Video/Dynamic_Info/Logined_Animation/AE Raw Document/(Footage)/3DScanner_logo.png"
+            alt=""
+            class="machine-section__icon"
+            aria-hidden="true"
+          >
+          <div class="machine-section__meta">
+            <div class="machine-section__title-row">
+              <h2 class="machine-section__name" id="scanner-title">3D Scanner</h2>
+              <span class="badge-training">Training Required ⓘ</span>
+            </div>
+            <p class="machine-section__desc">Scan physical object to digital format</p>
+          </div>
+        </div>
+        <div class="machine-cards machine-cards--one">
+          <div class="machine-card">
+            <div class="machine-card__photo-wrap">
+              <img
+                src="assets/IC MakerLab Website/Photograhpic/Homepage Machine Icon/EinScan_Pro_HD1.jpg"
+                alt="EinScan Pro HD"
+                class="machine-card__photo"
+              >
+            </div>
+            <div class="machine-card__info">
+              <div class="machine-card__name-bar">EinScan Pro HD</div>
+              <div class="machine-card__detail-bar">
+                <div class="machine-card__tags">
+                  <span class="mtag">Fast</span>
+                  <span class="mtag">Multi-colour</span>
+                  <span class="mtag">High-quality</span>
+                </div>
+                <div class="machine-card__price">
+                  <span class="price-val">Free</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- /.machine-list -->
+
+  <script src="main.js"></script>
+</body>
+</html>
