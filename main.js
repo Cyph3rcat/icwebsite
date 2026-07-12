@@ -480,8 +480,9 @@ function renderMachinePopup(key) {
   ).join('');
 
   // Reset scroll and slide
-  const card = document.getElementById('mpopup-card');
-  if (card) card.scrollTop = 0;
+  const scrollport = document.getElementById('mpopup-scrollport');
+  if (scrollport) scrollport.scrollTop = 0;
+  setActiveSideBtn(mpopSideBtns[0]); // back at the top, so About is in view
 
   // Sync active tab
   document.querySelectorAll('.mpop-tab').forEach(tab => {
@@ -530,18 +531,59 @@ document.querySelectorAll('.mpop-tab').forEach(tab => {
 document.getElementById('mpopup-prev').addEventListener('click', () => goToSlide(currentSlide - 1));
 document.getElementById('mpopup-next').addEventListener('click', () => goToSlide(currentSlide + 1));
 
-// Sidebar nav scroll
-document.querySelectorAll('.mpop-side-btn[data-scroll-to]').forEach(btn => {
+// Sidebar nav: click scrolls to the section; the button whose section is
+// currently in view stays extended (is-active), like a real tab.
+const mpopSideBtns = Array.from(document.querySelectorAll('.mpop-side-btn[data-scroll-to]'));
+let mpopSideNavLocked = false; // suppress scrollspy while a click's smooth scroll runs
+
+function setActiveSideBtn(activeBtn) {
+  mpopSideBtns.forEach(b => b.classList.toggle('is-active', b === activeBtn));
+}
+
+// The reading line matches where the click handler parks each section
+function mpopSectionGap(card) {
+  const cardStyle = getComputedStyle(card);
+  const u = parseFloat(cardStyle.getPropertyValue('--u')) || 0;
+  return (parseFloat(cardStyle.paddingTop) || 0) + (24 * u);
+}
+
+function updateSideNav() {
+  if (mpopSideNavLocked) return;
+  const scrollport = document.getElementById('mpopup-scrollport');
+  const card = document.getElementById('mpopup-card');
+  if (!scrollport || !card) return;
+  const portTop = scrollport.getBoundingClientRect().top;
+  const line = scrollport.scrollTop + mpopSectionGap(card) + 1;
+  let active = mpopSideBtns[0];
+  mpopSideBtns.forEach(btn => {
+    const target = document.getElementById(btn.dataset.scrollTo);
+    if (!target) return;
+    const top = target.getBoundingClientRect().top - portTop + scrollport.scrollTop;
+    if (top <= line) active = btn;
+  });
+  // Bottomed out: the last section wins even if too short to reach the line
+  if (scrollport.scrollTop + scrollport.clientHeight >= scrollport.scrollHeight - 2) {
+    active = mpopSideBtns[mpopSideBtns.length - 1];
+  }
+  setActiveSideBtn(active);
+}
+
+document.getElementById('mpopup-scrollport').addEventListener('scroll', updateSideNav, { passive: true });
+
+mpopSideBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     const target = document.getElementById(btn.dataset.scrollTo);
-    const card   = document.getElementById('mpopup-card');
-    if (!target || !card) return;
+    const scrollport = document.getElementById('mpopup-scrollport');
+    const card = document.getElementById('mpopup-card');
+    if (!target || !scrollport || !card) return;
     // Stop short of the section so its title isn't flush with the card top
-    const cardStyle = getComputedStyle(card);
-    const u = parseFloat(cardStyle.getPropertyValue('--u')) || 0;
-    const gap = (parseFloat(cardStyle.paddingTop) || 0) + (24 * u);
-    const top = target.getBoundingClientRect().top - card.getBoundingClientRect().top + card.scrollTop - gap;
-    card.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+    const gap = mpopSectionGap(card);
+    const top = target.getBoundingClientRect().top - scrollport.getBoundingClientRect().top + scrollport.scrollTop - gap;
+    setActiveSideBtn(btn);
+    mpopSideNavLocked = true;
+    scrollport.addEventListener('scrollend', () => { mpopSideNavLocked = false; }, { once: true });
+    setTimeout(() => { mpopSideNavLocked = false; }, 1200); // in case scrollend never fires
+    scrollport.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
   });
 });
 
