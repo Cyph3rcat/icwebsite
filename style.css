@@ -938,6 +938,7 @@ button {
 ================================================ */
 
 .mpop-overlay {
+  --mpop-pad-top: clamp(16px, 2vh, 40px);
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -947,7 +948,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(16px, 2vh, 40px) clamp(12px, 2vw, 40px);
+  padding: var(--mpop-pad-top) clamp(12px, 2vw, 40px) 0;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -964,8 +965,7 @@ button {
   position: relative;
   width: calc(497 * var(--u));
   max-width: 100%;
-  height: 88vh;
-  /* overflow visible so mascot can stick outside */
+  height: 100%;
   flex-shrink: 0;
   font-family: 'Poppins', sans-serif;
   transform: translateY(40px) scale(0.95);
@@ -1112,6 +1112,9 @@ button {
 
 .mpop-side-btn:hover { width: calc(42.5 * var(--u)); filter: brightness(1.08); }
 
+/* Tab whose section is currently in view stays extended, like a selected tab */
+.mpop-side-btn.is-active { width: calc(42.5 * var(--u)); }
+
 .mpop-side-icon {
   width: calc(14 * var(--u));
   height: calc(15 * var(--u));
@@ -1130,27 +1133,42 @@ button {
 .mpop-side-btn--hint  { background: #F2685F; }
 .mpop-side-btn--faq   { background: #17DA99; }
 
-/* ---- Main scrollable card (design "Body") ---- */
-.mpop-card {
+/* ---- Scroll viewport: covers the whole wrap so the card can slide up
+   behind the topbar/sidebar (which sit above it on z-index). Topbar,
+   sidebar and book-now all live outside this element, so they never move. ---- */
+.mpop-scrollport {
   position: absolute;
-  top: calc(42.57 * var(--u));
-  left: calc(35.47 * var(--u));
+  /* reach above the wrap (through the overlay's top padding) so the
+     scrolled card clips at the viewport top, not at the wrap top */
+  top: calc(-1 * var(--mpop-pad-top));
+  left: 0;
   right: 0;
   bottom: 0;
-  background: #E8EEF0;
-  border-radius: 0 calc(70.95 * var(--u)) calc(10.64 * var(--u)) calc(10.64 * var(--u));
-  padding: calc(24.83 * var(--u));
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+.mpop-scrollport::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* ---- Main card (design "Body") — natural height, grows past the
+   viewport so scrolling moves the whole card, not just its contents ---- */
+.mpop-card {
+  /* offsets replace the old scrollport inset so the card starts below the
+     topbar / right of the sidebar, but can still scroll up past them */
+  margin-top: calc(42.57 * var(--u) + var(--mpop-pad-top));
+  margin-left: calc(35.47 * var(--u));
+  min-height: calc(100% - 42.57 * var(--u) - var(--mpop-pad-top));
+  background: #E8EEF0;
+  border-radius: 0 calc(70.95 * var(--u)) 0 0;
+  overflow: clip; /* clip the price badge (and anything else) to the rounded corner */
+  padding: calc(24.83 * var(--u));
   display: flex;
   flex-direction: column;
   gap: calc(14.19 * var(--u));
 }
-
-.mpop-card::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* ---- Spec + pic ---- */
 .mpop-hero {
@@ -1794,27 +1812,39 @@ button {
   pointer-events: all;
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(75.56 * var(--u));
-  height: calc(21.6 * var(--u));
-  background: #0A86FF;
-  color: #F5F8F9;
-  font-family: 'Poppins', sans-serif;
-  font-size: calc(10.64 * var(--u));
-  font-weight: 500;
+  display: block;
+  width: calc(75.56 * var(--u));  /* Figma 213x138, x0.3547 */
+  height: calc(48.95 * var(--u));
+  padding: 0;
+  background: none;
   border: none;
-  border-radius: 100px;
   cursor: pointer;
-  letter-spacing: 0.02em;
-  box-shadow: 0 6px 24px rgba(0, 127, 255, 0.42);
-  transition: background 0.2s, box-shadow 0.3s, transform 0.25s ease;
+  transition: transform 0.25s ease;
+  transform-origin: 50% 100%;
 }
 
+.mpop-booknow.is-login {
+  width: calc(98.26 * var(--u));  /* Figma 277x139 */
+  height: calc(49.31 * var(--u));
+}
+
+.mpop-booknow__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+.mpop-booknow__img--book { display: block; }
+.mpop-booknow:hover .mpop-booknow__img--book { display: none; }
+.mpop-booknow:hover .mpop-booknow__img--hover { display: block; }
+
+.mpop-booknow.is-login .mpop-booknow__img--book,
+.mpop-booknow.is-login .mpop-booknow__img--hover { display: none; }
+.mpop-booknow.is-login .mpop-booknow__img--login { display: block; }
+
 .mpop-booknow:hover {
-  background: #006CD6;
-  box-shadow: 0 10px 32px rgba(0, 127, 255, 0.56);
   transform: scale(1.06) translateY(-2px);
 }
 
@@ -1845,5 +1875,5 @@ button {
   .mpop-samples-row { flex-wrap: wrap; justify-content: center; }
   .mpop-reminder-row, .mpop-prepare-row { flex-direction: column; }
   .mpop-sidebar { display: none; }
-  .mpop-card { left: 0; border-radius: calc(10.64 * var(--u)) calc(40 * var(--u)) calc(10.64 * var(--u)) calc(10.64 * var(--u)); }
+  .mpop-card { margin-left: 0; border-radius: calc(10.64 * var(--u)) calc(40 * var(--u)) 0 0; }
 }

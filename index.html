@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IC MakerLab – Booking</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="booking.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=Libre+Barcode+39+Text&family=Libre+Barcode+39+Extended+Text&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -90,7 +91,23 @@
         <source src="assets/Video/Dynamic_Info/notLogin_Animation/video_dynamicinfo_1.webm" type="video/webm">
       </video>
     </div>
-    
+
+    <!-- Booked-Section ticket(s): replaces the hero after a booking (booking.js).
+         One .hero-ticket__slide per booking; slides scroll horizontally behind
+         the nav arrow when there is more than one. -->
+    <div class="hero-ticket" id="hero-ticket" aria-hidden="true">
+      <div class="hero-ticket__viewport">
+        <div class="hero-ticket__track" id="hero-ticket-track"></div>
+      </div>
+      <button class="hero-ticket__nav hero-ticket__nav--prev" id="hero-ticket-prev" aria-label="Show previous booking" hidden>
+        <img src="assets/Icon/Arrow/Ticket_swap_left.svg" alt="">
+      </button>
+      <button class="hero-ticket__nav hero-ticket__nav--next" id="hero-ticket-next" aria-label="Show next booking" hidden>
+        <img src="assets/Icon/Arrow/Ticket_swap_right.svg" alt="">
+      </button>
+      <div class="hero-ticket__dots" id="hero-ticket-dots" hidden></div>
+    </div>
+
   </section>
 
   <!-- ===================== MACHINE TYPE NAV ===================== -->
@@ -423,7 +440,8 @@
       </button>
     </nav>
 
-    <!-- Scrollable body card -->
+    <!-- Scroll viewport: clips + scrolls the card as a whole -->
+    <div class="mpop-scrollport" id="mpopup-scrollport">
     <div class="mpop-card" id="mpopup-card">
 
       <!-- Spec + pic -->
@@ -537,15 +555,290 @@
         <div class="mpop-bottom-spacer"></div>
       </div>
     </div><!-- /.mpop-card -->
+    </div><!-- /.mpop-scrollport -->
 
     <!-- Book Now — not inside card, does not scroll -->
     <div class="mpop-booknow-wrap">
-      <button class="mpop-booknow" id="mpopup-booknow">Book Now</button>
+      <button class="mpop-booknow" id="mpopup-booknow" aria-label="Book Now">
+        <img class="mpop-booknow__img mpop-booknow__img--book" src="assets/popup/booknow_book.svg" alt="">
+        <img class="mpop-booknow__img mpop-booknow__img--hover" src="assets/popup/booknow_book_hover.svg" alt="">
+        <img class="mpop-booknow__img mpop-booknow__img--login" src="assets/popup/booknow_login.svg" alt="">
+      </button>
     </div>
 
   </div><!-- /.mpop-wrap -->
 </div>
 
+<!-- ============================================================
+     BOOKING FLOW (Bambu X1) — driven by booking.js / booking.css
+============================================================ -->
+
+<!-- View 1: Pick your time Slot -->
+<div id="bk-select" class="bk-view" aria-hidden="true">
+  <div class="bk-canvas">
+    <button class="bk-back" id="bk-back" aria-label="Back">
+      <img src="assets/Icon/Arrow/Book_back.svg" alt="">
+    </button>
+    <img class="bk-photo" src="assets/booking/booking_photo.jpg" alt="Bambu X1 Carbon printers">
+    <h1 class="bk-title">Pick your time Slot.</h1>
+
+    <div class="bk-controls">
+      <div class="bk-chipgroup">
+        <span class="bk-chip" id="bk-week-chip">Week 1</span>
+        <span class="bk-chip" id="bk-month-chip">Month</span>
+      </div>
+      <button class="bk-viewmonth" id="bk-viewmonth">View Month</button>
+    </div>
+
+    <div class="bk-daybar">
+      <button class="bk-day-arrow bk-day-arrow--left" id="bk-week-prev" aria-label="Previous week">
+        <img class="bk-day-arrow__img bk-day-arrow__img--default" src="assets/Icon/Arrow/Book_date_left.svg" alt="">
+        <img class="bk-day-arrow__img bk-day-arrow__img--hover" src="assets/Icon/Arrow/Book_date_left_hover.svg" alt="">
+      </button>
+      <div class="bk-days" id="bk-days"></div>
+      <button class="bk-day-arrow" id="bk-week-next" aria-label="Next week">
+        <img class="bk-day-arrow__img bk-day-arrow__img--default" src="assets/Icon/Arrow/Book_date_right.svg" alt="">
+        <img class="bk-day-arrow__img bk-day-arrow__img--hover" src="assets/Icon/Arrow/Book_date_right_hover.svg" alt="">
+      </button>
+    </div>
+
+    <div class="bk-slotarea">
+      <div class="bk-selected-card">
+        <img src="assets/booking/slot_sun.svg" alt="">
+        <p class="bk-selected-time" id="bk-selected-time">9:00 - 10:00</p>
+        <p class="bk-selected-dur" id="bk-selected-dur">1 Hours Section</p>
+        <p class="bk-selected-label">Selected Slot</p>
+      </div>
+      <div class="bk-slots" id="bk-slots"></div>
+    </div>
+
+    <div class="bk-ticket">
+      <div class="bk-ticket-head">Booking Section</div>
+      <img class="bk-ticket-printer" src="assets/booking/printer_cutout.png" alt="">
+      <p class="bk-ticket-name" id="bk-ticket-name">Bambu X1 Carbon</p>
+      <div class="bk-ticket-when">
+        <span id="bk-ticket-when">Next Monday</span>
+        <img src="assets/Icon/Arrow/Ticket_deco.svg" alt="">
+      </div>
+      <div class="bk-ticket-meta">
+        <div>
+          <p class="l">Date</p>
+          <p id="bk-ticket-date">December 28</p>
+        </div>
+        <div>
+          <p class="l">Section</p>
+          <p id="bk-ticket-section">9:00 - 12:00 (3 hours)</p>
+        </div>
+      </div>
+      <p class="bk-barcode">IE maker Lab</p>
+    </div>
+
+    <div class="bk-cta">
+      <svg class="bk-cta-mascot" preserveAspectRatio="none" viewBox="0 0 79.7401 118.448" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M25.7737 10.7539C31.0276 0.666124 43.6313 -3.00617 53.4814 2.68077C63.0366 8.19749 66.3105 20.4157 60.7938 29.971L35.2085 74.286C30.0803 83.1684 18.7955 86.3267 9.80151 81.3969C0.801472 76.4637 -2.60402 65.2409 2.13687 56.1381L25.7737 10.7539Z" fill="currentColor"/>
+        <path d="M46.6598 38.1455C50.648 31.2378 59.4809 28.871 66.3886 32.8592C73.2963 36.8474 75.663 45.6802 71.6749 52.588L37.8211 111.224C33.833 118.132 25.0001 120.499 18.0924 116.511C11.1847 112.522 8.81794 103.69 12.8061 96.7819L46.6598 38.1455Z" fill="currentColor"/>
+        <path d="M56.9265 9.70045C56.9084 8.89084 58.0112 8.63515 58.3512 9.37013L64.189 21.9902C64.3147 22.2618 64.5902 22.4322 64.8894 22.4232L78.9696 22.0011C79.7853 21.9767 80.0437 23.0911 79.3004 23.4281L66.4709 29.2448C66.1984 29.3684 66.0259 29.6427 66.0326 29.9418L66.3436 43.8433C66.3617 44.6529 65.2588 44.9086 64.9188 44.1736L59.081 31.5535C58.9554 31.2819 58.6798 31.1115 58.3807 31.1205L44.3005 31.5426C43.4847 31.567 43.2264 30.4526 43.9697 30.1156L56.7992 24.2989C57.0717 24.1753 57.2442 23.901 57.2375 23.6019L56.9265 9.70045Z" fill="#E8F0F0"/>
+        <path d="M39.782 35.7055C39.782 33.1596 41.8459 31.0957 44.3918 31.0957C46.9377 31.0957 49.0016 33.1596 49.0016 35.7055V48.5106C49.0016 51.0565 46.9377 53.1204 44.3918 53.1204C41.8459 53.1204 39.782 51.0565 39.782 48.5106V35.7055Z" fill="#E8F0F0"/>
+        <path d="M19.2938 35.4494C19.2938 33.0449 21.2431 31.0957 23.6476 31.0957C26.0521 31.0957 28.0013 33.0449 28.0013 35.4494V48.7667C28.0013 51.1712 26.0521 53.1204 23.6476 53.1204C21.2431 53.1204 19.2938 51.1712 19.2938 48.7667V35.4494Z" fill="#E8F0F0"/>
+      </svg>
+      <button class="bk-cta-btn" id="bk-book-btn">Book Section</button>
+    </div>
+  </div>
+
+  <!-- Calendar popup -->
+  <div class="bk-cal-overlay" id="bk-cal-overlay" aria-hidden="true">
+    <div class="bk-cal">
+      <p class="bk-cal-title"><span class="y" id="bk-cal-year">2026</span><span class="m" id="bk-cal-month">December</span></p>
+      <button class="bk-cal-nav" id="bk-cal-prev" aria-label="Previous month">
+        <img src="assets/Icon/Arrow/Calendar_arrow_left.svg" alt="">
+      </button>
+      <button class="bk-cal-nav" id="bk-cal-next" aria-label="Next month">
+        <img src="assets/Icon/Arrow/Calendar_arrow_right.svg" alt="">
+      </button>
+      <button class="bk-cal-close" id="bk-cal-close" aria-label="Close">
+        <svg viewBox="0 0 33 33" fill="none"><path d="M4 4L29 29M29 4L4 29" stroke="#204b66" stroke-width="4.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="bk-cal-weekdays">
+        <span class="we">Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thur</span><span>Fri</span><span class="we">Sat</span>
+      </div>
+      <hr class="bk-cal-divider">
+      <div class="bk-cal-grid" id="bk-cal-grid"></div>
+      <button class="bk-cal-confirm" id="bk-cal-confirm">Confirm</button>
+    </div>
+  </div>
+
+  <!-- Confirm Booking ticket (slides in from the left) -->
+  <div class="bk-confirm-overlay" id="bk-confirm-overlay" aria-hidden="true">
+    <div class="bk-confirm">
+      <div class="bk-confirm-circle"></div>
+      <div class="bk-confirm-head">Confirm Booking</div>
+      <img class="bk-confirm-printer" src="assets/booking/printer_cutout.png" alt="">
+      <p class="bk-confirm-name" id="bk-confirm-name">Bambu X1 Carbon</p>
+      <div class="bk-confirm-when">
+        <span id="bk-confirm-when">Next Monday</span>
+        <img src="assets/Icon/Arrow/Ticket_deco.svg" alt="">
+      </div>
+      <div class="bk-confirm-meta">
+        <div>
+          <p class="l">Section</p>
+          <p class="v" id="bk-confirm-section">9:00 - 12:00 (3 hours)</p>
+        </div>
+        <div>
+          <p class="l">Date</p>
+          <p class="v" id="bk-confirm-date">June 16 (Week 6)</p>
+        </div>
+      </div>
+      <div class="bk-safety" id="bk-safety" role="checkbox" aria-checked="false" tabindex="0">
+        <span class="bk-safety-box"></span>
+        <span class="bk-safety-text">I have read and accept the <a href="#" onclick="return false">IC Safety policy</a></span>
+      </div>
+      <div class="bk-confirm-actions">
+        <button class="bk-confirm-btn" id="bk-confirm-btn">Confirm</button>
+        <button class="bk-cancel-btn" id="bk-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View 2: post-booking info wizard (3 pages) -->
+<div id="bk-info" class="bk-view" aria-hidden="true">
+  <div class="bk-canvas">
+
+    <!-- Page A: Booked successfully -->
+    <section class="bk-page is-active" id="bk-page-a">
+      <h1 class="bk-info-title">Booked successfully</h1>
+      <button class="bk-skip" id="bk-skip">Skip <img src="assets/Icon/Arrow/Book_Skip.svg" alt=""></button>
+      <div class="bk-card bk-card--machine">
+        <img src="assets/photos/BambuX1_Carbon1.jpg" alt="Bambu X1 Carbon">
+        <div class="bk-card-fade"></div>
+        <p class="bk-card-caption" id="bk-info-machine">Bambu X1 Carbon</p>
+      </div>
+      <div class="bk-card bk-card--venue">
+        <img src="assets/booking/venue_w503.jpg" alt="Venue W503">
+        <div class="bk-card-fade"></div>
+        <p class="bk-card-sub">W503</p>
+        <p class="bk-card-caption">Venue</p>
+      </div>
+      <div class="bk-card bk-card--visit">
+        <p class="h">Visit Date</p>
+        <p class="sub" id="bk-visit-rel">2 Day later</p>
+        <p class="big" id="bk-visit-date">Dec 18 Thursday</p>
+      </div>
+      <div class="bk-card bk-card--session">
+        <p class="h">Session</p>
+        <p class="sub" id="bk-session-total">Total 1 Hours</p>
+        <p class="big" id="bk-session-time">10:00 - 12:00</p>
+      </div>
+    </section>
+
+    <!-- Page B: What to do after booking -->
+    <section class="bk-page" id="bk-page-b">
+      <h1 class="bk-info-title">What to do after booking</h1>
+      <p class="bk-sub-title">Arriving IE Maker Lab</p>
+      <p class="bk-sub-desc"><b>Self Service</b> process of IE Maker Lab</p>
+      <div class="bk-steps">
+        <div class="bk-steps-row">
+          <div class="bk-step">
+            <img class="bg" src="assets/booking/step1.jpg" alt="">
+            <div class="bk-step-shade"></div>
+            <p class="step-n">Step 1</p>
+            <p class="step-h">Pick Machine</p>
+            <p class="step-d">Scan <b>student ID card</b> and choose the available machine</p>
+            <img class="arr" src="assets/booking/arrow_forward.svg" alt="">
+          </div>
+          <div class="bk-step">
+            <img class="bg" src="assets/booking/step2.jpg" alt="">
+            <div class="bk-step-shade"></div>
+            <p class="step-n">Step 2</p>
+            <p class="step-h">Slicing</p>
+            <p class="step-d"><b>Input the file</b> in bambu software and <b>adjust the support and thickness of layer</b></p>
+            <img class="arr" src="assets/booking/arrow_forward.svg" alt="">
+          </div>
+          <div class="bk-step bk-step--round-tr">
+            <img class="bg" src="assets/booking/step3.jpg" alt="">
+            <div class="bk-step-shade"></div>
+            <p class="step-n">Step 3</p>
+            <p class="step-h">Import to Printer</p>
+            <p class="step-d">Input the file into the <b>SD card</b> of machine and start printing</p>
+            <img class="arr arr--down" src="assets/booking/arrow_forward.svg" alt="">
+          </div>
+        </div>
+        <div class="bk-steps-row">
+          <div class="bk-step bk-step--wide">
+            <img class="bg" src="assets/booking/step5.jpg" alt="">
+            <div class="bk-step-shade"></div>
+            <p class="step-n">Step 5</p>
+            <p class="step-h">Pay for service</p>
+            <p class="step-d"><b>Pay at 3/F general office</b> after getting the model</p>
+          </div>
+          <div class="bk-step bk-step--wide bk-step--round-br">
+            <img class="bg" src="assets/booking/step4.jpg" alt="">
+            <div class="bk-step-shade"></div>
+            <p class="step-n">Step 4</p>
+            <p class="step-h">Write Record Paper for record</p>
+            <p class="step-d"><b>Finish the record paper</b> and put it in the box on the machine. Then wait for the model</p>
+            <img class="arr arr--left" src="assets/booking/arrow_forward.svg" alt="">
+          </div>
+        </div>
+      </div>
+      <button class="bk-return" data-goto="a">Return</button>
+    </section>
+
+    <!-- Page C: What to prepare -->
+    <section class="bk-page" id="bk-page-c">
+      <h1 class="bk-info-title bk-info-title--left">What to prepare?</h1>
+      <div class="bk-prepare-row">
+        <div class="bk-prepare-card">
+          <img src="assets/Icon/Machine Feature/STL_file.svg" alt="">
+          <p>STL file</p>
+        </div>
+        <div class="bk-prepare-card">
+          <img src="assets/Icon/Machine Feature/USB.svg" alt="">
+          <p>USB</p>
+        </div>
+        <div class="bk-prepare-card">
+          <img src="assets/Icon/Machine Feature/Cash.svg" alt="">
+          <p>Cash or Octopus Card</p>
+        </div>
+      </div>
+      <hr class="bk-divider">
+      <h2 class="bk-reminder-title">Reminder</h2>
+      <div class="bk-reminder-row">
+        <div class="bk-reminder-card bk-reminder-card--print">
+          <img src="assets/booking/print_setting.jpg" alt="">
+          <div class="bk-reminder-fade"></div>
+          <p class="h">Print Setting</p>
+          <p class="d">The model should be on the printing surface.</p>
+        </div>
+        <div class="bk-reminder-card bk-reminder-card--model">
+          <p class="h">3D model</p>
+          <p class="d">Should be closed surface</p>
+        </div>
+      </div>
+      <button class="bk-return" data-goto="b">Return</button>
+    </section>
+
+    <!-- Shared wizard footer -->
+    <div class="bk-dots">
+      <button class="bk-dot is-active" data-page="a" aria-label="Page 1"></button>
+      <button class="bk-dot" data-page="b" aria-label="Page 2"></button>
+      <button class="bk-dot" data-page="c" aria-label="Page 3"></button>
+    </div>
+    <p class="bk-next-hint" id="bk-next-hint">What to do upon arriving</p>
+    <div class="bk-cta bk-cta--info">
+      <svg class="bk-cta-mascot" preserveAspectRatio="none" viewBox="0 0 79.7401 118.448" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M25.7737 10.7539C31.0276 0.666124 43.6313 -3.00617 53.4814 2.68077C63.0366 8.19749 66.3105 20.4157 60.7938 29.971L35.2085 74.286C30.0803 83.1684 18.7955 86.3267 9.80151 81.3969C0.801472 76.4637 -2.60402 65.2409 2.13687 56.1381L25.7737 10.7539Z" fill="currentColor"/>
+        <path d="M46.6598 38.1455C50.648 31.2378 59.4809 28.871 66.3886 32.8592C73.2963 36.8474 75.663 45.6802 71.6749 52.588L37.8211 111.224C33.833 118.132 25.0001 120.499 18.0924 116.511C11.1847 112.522 8.81794 103.69 12.8061 96.7819L46.6598 38.1455Z" fill="currentColor"/>
+        <path d="M56.9265 9.70045C56.9084 8.89084 58.0112 8.63515 58.3512 9.37013L64.189 21.9902C64.3147 22.2618 64.5902 22.4322 64.8894 22.4232L78.9696 22.0011C79.7853 21.9767 80.0437 23.0911 79.3004 23.4281L66.4709 29.2448C66.1984 29.3684 66.0259 29.6427 66.0326 29.9418L66.3436 43.8433C66.3617 44.6529 65.2588 44.9086 64.9188 44.1736L59.081 31.5535C58.9554 31.2819 58.6798 31.1115 58.3807 31.1205L44.3005 31.5426C43.4847 31.567 43.2264 30.4526 43.9697 30.1156L56.7992 24.2989C57.0717 24.1753 57.2442 23.901 57.2375 23.6019L56.9265 9.70045Z" fill="#E8F0F0"/>
+        <path d="M39.782 35.7055C39.782 33.1596 41.8459 31.0957 44.3918 31.0957C46.9377 31.0957 49.0016 33.1596 49.0016 35.7055V48.5106C49.0016 51.0565 46.9377 53.1204 44.3918 53.1204C41.8459 53.1204 39.782 51.0565 39.782 48.5106V35.7055Z" fill="#E8F0F0"/>
+        <path d="M19.2938 35.4494C19.2938 33.0449 21.2431 31.0957 23.6476 31.0957C26.0521 31.0957 28.0013 33.0449 28.0013 35.4494V48.7667C28.0013 51.1712 26.0521 53.1204 23.6476 53.1204C21.2431 53.1204 19.2938 51.1712 19.2938 48.7667V35.4494Z" fill="#E8F0F0"/>
+      </svg>
+      <button class="bk-cta-btn" id="bk-continue">Continue</button>
+    </div>
+  </div>
+</div>
+
 <script src="main.js"></script>
+<script src="booking.js"></script>
 </body>
 </html>

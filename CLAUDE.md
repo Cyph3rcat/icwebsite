@@ -33,3 +33,6 @@ Three source files drive the entire page:
 ## Login State
 
 `LoggedIn` is a plain JS boolean (not persisted). On login: hero video swaps to `video_dynamicinfo_2.webm`, the CTA SVG `d` path changes to show logged-in text ("Find Your Booking"), and training badges are randomised after 1.5s to `passed` or `notpass` CSS classes. On logout everything is restored from saved path strings.
+
+
+
