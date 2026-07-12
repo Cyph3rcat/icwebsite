@@ -1,0 +1,13 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="44.4922" y="12.5879" width="62.0401" height="62.0401" rx="7.7233" stroke="#204B66" stroke-width="8"/>
+<path d="M20.2588 11.7012L20.2588 74.7372" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<line x1="11.1295" y1="68.5117" x2="20.308" y2="77.6902" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<line x1="4" y1="-4" x2="16.9803" y2="-4" transform="matrix(0.707107 -0.707107 -0.707107 -0.707107 5.47266 20.3105)" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<line x1="4" y1="-4" x2="16.9803" y2="-4" transform="matrix(-0.707107 0.707107 0.707107 0.707107 35.1436 68.5117)" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<line x1="29.4867" y1="20.3105" x2="20.3082" y2="11.1321" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<path d="M108.248 99.6406L45.212 99.6406" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<line x1="51.4375" y1="90.5104" x2="42.259" y2="99.6889" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<line x1="4" y1="-4" x2="16.9803" y2="-4" transform="matrix(0.707107 0.707107 0.707107 -0.707107 99.6387 84.8535)" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<line x1="4" y1="-4" x2="16.9803" y2="-4" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 51.4375 114.525)" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+<line x1="99.6387" y1="108.869" x2="108.817" y2="99.69" stroke="#204B66" stroke-width="8" stroke-linecap="round"/>
+</svg>

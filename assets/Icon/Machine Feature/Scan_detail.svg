@@ -1,0 +1,18 @@
+<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1354_5602)">
+<rect x="3.53125" y="3.84976" width="102.665" height="102.665" rx="14.1719" transform="rotate(-0.177385 3.53125 3.84976)" stroke="#204B66" stroke-width="6.48462" stroke-linejoin="round"/>
+<line x1="80.4679" y1="18.7131" x2="90.9896" y2="18.7131" stroke="#204B66" stroke-width="6.48462" stroke-linecap="round"/>
+<line x1="3.24231" y1="-3.24231" x2="13.764" y2="-3.24231" transform="matrix(1 -8.74228e-08 -8.74228e-08 -1 77.2256 87.1462)" stroke="#204B66" stroke-width="6.48462" stroke-linecap="round"/>
+<line x1="90.9891" y1="30.0506" x2="90.9891" y2="19.5289" stroke="#204B66" stroke-width="6.48462" stroke-linecap="round"/>
+<line x1="3.24231" y1="-3.24231" x2="13.764" y2="-3.24231" transform="matrix(4.37114e-08 1 1 -4.37114e-08 94.2314 75.8087)" stroke="#204B66" stroke-width="6.48462" stroke-linecap="round"/>
+<line x1="3.24231" y1="-3.24231" x2="13.764" y2="-3.24231" transform="matrix(-1 8.74228e-08 8.74228e-08 1 30.9316 21.9554)" stroke="#204B66" stroke-width="6.48462" stroke-linecap="round"/>
+<line x1="27.6893" y1="90.3885" x2="17.1677" y2="90.3885" stroke="#204B66" stroke-width="6.48462" stroke-linecap="round"/>
+<line x1="3.24231" y1="-3.24231" x2="13.764" y2="-3.24231" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 13.9258 33.2929)" stroke="#204B66" stroke-width="6.48462" stroke-linecap="round"/>
+<line x1="17.1681" y1="79.051" x2="17.1681" y2="89.5726" stroke="#204B66" stroke-width="6.48462" stroke-linecap="round"/>
+</g>
+<defs>
+<clipPath id="clip0_1354_5602">
+<rect width="110" height="110" fill="white"/>
+</clipPath>
+</defs>
+</svg>

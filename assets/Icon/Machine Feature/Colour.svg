@@ -1,0 +1,19 @@
+<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1353_5175)">
+<circle cx="54.9998" cy="54.9998" r="51.0642" stroke="#204B66" stroke-width="7.42752"/>
+<circle cx="54.9991" cy="55.0001" r="27.2598" stroke="#204B66" stroke-width="7.42752"/>
+<line x1="56.0253" y1="6.23828" x2="56.0253" y2="29.2748" stroke="#204B66" stroke-width="7.42752"/>
+<line x1="56.0253" y1="79.9531" x2="56.0253" y2="102.99" stroke="#204B66" stroke-width="7.42752"/>
+<line x1="90.4239" y1="21.919" x2="74.1346" y2="38.2083" stroke="#204B66" stroke-width="7.42752"/>
+<line y1="-3.71376" x2="23.0365" y2="-3.71376" transform="matrix(0.707107 0.707107 0.707107 -0.707107 21.5967 20.8281)" stroke="#204B66" stroke-width="7.42752"/>
+<line y1="-3.71376" x2="23.0365" y2="-3.71376" transform="matrix(-0.707107 -0.707107 -0.707107 0.707107 90.1006 87.7969)" stroke="#204B66" stroke-width="7.42752"/>
+<path d="M15.4402 85.4832L31.5765 69.3454" stroke="#204B66" stroke-width="7.42752"/>
+<line x1="102.991" y1="58.329" x2="79.9547" y2="58.329" stroke="#204B66" stroke-width="7.42752"/>
+<path d="M28.2959 57.8965H3.93492" stroke="#204B66" stroke-width="7.42752"/>
+</g>
+<defs>
+<clipPath id="clip0_1353_5175">
+<rect width="110" height="110" fill="white"/>
+</clipPath>
+</defs>
+</svg>
