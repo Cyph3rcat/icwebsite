@@ -1163,6 +1163,7 @@ button {
   min-height: calc(100% - 42.57 * var(--u) - var(--mpop-pad-top));
   background: #E8EEF0;
   border-radius: 0 calc(70.95 * var(--u)) 0 0;
+  overflow: clip; /* clip the price badge (and anything else) to the rounded corner */
   padding: calc(24.83 * var(--u));
   display: flex;
   flex-direction: column;
@@ -1811,27 +1812,39 @@ button {
   pointer-events: all;
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(75.56 * var(--u));
-  height: calc(21.6 * var(--u));
-  background: #0A86FF;
-  color: #F5F8F9;
-  font-family: 'Poppins', sans-serif;
-  font-size: calc(10.64 * var(--u));
-  font-weight: 500;
+  display: block;
+  width: calc(75.56 * var(--u));  /* Figma 213x138, x0.3547 */
+  height: calc(48.95 * var(--u));
+  padding: 0;
+  background: none;
   border: none;
-  border-radius: 100px;
   cursor: pointer;
-  letter-spacing: 0.02em;
-  box-shadow: 0 6px 24px rgba(0, 127, 255, 0.42);
-  transition: background 0.2s, box-shadow 0.3s, transform 0.25s ease;
+  transition: transform 0.25s ease;
+  transform-origin: 50% 100%;
 }
 
+.mpop-booknow.is-login {
+  width: calc(98.26 * var(--u));  /* Figma 277x139 */
+  height: calc(49.31 * var(--u));
+}
+
+.mpop-booknow__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+.mpop-booknow__img--book { display: block; }
+.mpop-booknow:hover .mpop-booknow__img--book { display: none; }
+.mpop-booknow:hover .mpop-booknow__img--hover { display: block; }
+
+.mpop-booknow.is-login .mpop-booknow__img--book,
+.mpop-booknow.is-login .mpop-booknow__img--hover { display: none; }
+.mpop-booknow.is-login .mpop-booknow__img--login { display: block; }
+
 .mpop-booknow:hover {
-  background: #006CD6;
-  box-shadow: 0 10px 32px rgba(0, 127, 255, 0.56);
   transform: scale(1.06) translateY(-2px);
 }
 

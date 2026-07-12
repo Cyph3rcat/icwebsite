@@ -203,6 +203,7 @@ function setDemoTrainingStatus() {
 }
 
 function openTrainingModal(machineId) {
+  if (!LoggedIn) return; // training card is only shown to logged-in users
   const data = machineTrainingData[machineId];
   if (!data) return;
   document.getElementById('training-title').textContent = data.title;
@@ -357,6 +358,7 @@ function openMachinePopup(machineKey) {
   currentMachineKey = machineKey || 'bambu';
   currentSlide = 0;
   renderMachinePopup(currentMachineKey);
+  updateBooknowButton();
 
   const overlay = document.getElementById('machine-popup');
   overlay.classList.remove('is-closing');
@@ -510,6 +512,19 @@ function positionTabIndicator() {
 }
 
 // Close button
+function updateBooknowButton() {
+  const btn = document.getElementById('mpopup-booknow');
+  btn.classList.toggle('is-login', !LoggedIn);
+  btn.setAttribute('aria-label', LoggedIn ? 'Book Now' : 'Login to book');
+}
+
+document.getElementById('mpopup-booknow').addEventListener('click', function () {
+  if (!LoggedIn) {
+    doLogin();
+    updateBooknowButton();
+  }
+});
+
 document.getElementById('mpopup-close').addEventListener('click', closeMachinePopup);
 
 // Click outside popup to close
@@ -540,11 +555,12 @@ function setActiveSideBtn(activeBtn) {
   mpopSideBtns.forEach(b => b.classList.toggle('is-active', b === activeBtn));
 }
 
-// The reading line matches where the click handler parks each section
+// The reading line matches where the click handler parks each section:
+// the card's resting content top (margin-top clears the topbar zone +
+// overlay padding, padding-top gives the title breathing room below it).
 function mpopSectionGap(card) {
   const cardStyle = getComputedStyle(card);
-  const u = parseFloat(cardStyle.getPropertyValue('--u')) || 0;
-  return (parseFloat(cardStyle.paddingTop) || 0) + (24 * u);
+  return (parseFloat(cardStyle.marginTop) || 0) + (parseFloat(cardStyle.paddingTop) || 0);
 }
 
 function updateSideNav() {
