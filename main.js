@@ -174,6 +174,8 @@ function loggedOutStatus() {
     badge.textContent = 'Training Required ⓘ';
     badge.classList.remove('passed', 'notpass');
   });
+
+  if (typeof bkOnLogout === 'function') bkOnLogout();
 }
 
 function doLogin() {
@@ -522,6 +524,12 @@ document.getElementById('mpopup-booknow').addEventListener('click', function () 
   if (!LoggedIn) {
     doLogin();
     updateBooknowButton();
+    return;
+  }
+  // Booking flow implemented for Bambu X1 only so far (see booking.js)
+  if (typeof openBookingFlow === 'function' && currentMachineKey === 'bambu') {
+    closeMachinePopup();
+    openBookingFlow(currentMachineKey);
   }
 });
 
