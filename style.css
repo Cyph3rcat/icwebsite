@@ -1848,6 +1848,29 @@ button {
   transform: scale(1.06) translateY(-2px);
 }
 
+/* Mascot eyes: JS sets translate (cursor follow), blink squashes each eye */
+.bn-eyes {
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+.bn-eye {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.bn-eyes.is-blinking .bn-eye {
+  animation: bn-blink 0.32s ease-in-out both;
+}
+
+@keyframes bn-blink {
+  0%   { transform: scaleY(1); opacity: 1; }      /* open cylinder */
+  40%  { transform: scaleY(0.36); opacity: 1; }    /* shortens top-to-bottom into a circle */
+  60%  { transform: scaleY(0.05); opacity: 0; }    /* collapses and disappears */
+  78%  { transform: scaleY(0.05); opacity: 0; }    /* closed */
+  100% { transform: scaleY(1); opacity: 1; }       /* reopens */
+}
+
 @keyframes booknow-enter {
   from { transform: scale(0.5) translateY(18px); opacity: 0; }
   65%  { transform: scale(1.1) translateY(-4px); opacity: 1; }

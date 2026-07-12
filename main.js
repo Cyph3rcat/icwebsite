@@ -533,6 +533,45 @@ document.getElementById('mpopup-booknow').addEventListener('click', function () 
   }
 });
 
+// Mascot eyes (Book Now button + booking-flow CTA mascots): follow the cursor, plus occasional blinks.
+// One group per mascot instance — hidden ones (e.g. inactive button state) are skipped via svgRect.width check.
+(function () {
+  const groups = document.querySelectorAll('.mpop-booknow .bn-eyes, .bk-cta-mascot .bn-eyes');
+  if (!groups.length) return;
+  const MAX_OFFSET = 4.5;   // max eye travel, SVG user units
+  let raf = null;
+
+  document.addEventListener('mousemove', function (e) {
+    if (raf) return;
+    raf = requestAnimationFrame(function () {
+      raf = null;
+      groups.forEach(function (eyes) {
+        const svg = eyes.closest('svg');
+        const svgRect = svg.getBoundingClientRect();
+        if (!svgRect.width) return;             // hidden (popup closed / other state showing)
+        const scale = svgRect.width / svg.viewBox.baseVal.width;  // screen px per user unit
+        const eyeRect = eyes.getBoundingClientRect();
+        const dx = (e.clientX - (eyeRect.left + eyeRect.width / 2)) / scale;
+        const dy = (e.clientY - (eyeRect.top + eyeRect.height / 2)) / scale;
+        const dist = Math.hypot(dx, dy) || 1;
+        const offset = Math.min(dist / 12, MAX_OFFSET);
+        eyes.style.transform =
+          `translate(${(dx / dist * offset).toFixed(2)}px, ${(dy / dist * offset).toFixed(2)}px)`;
+      });
+    });
+  });
+
+  (function scheduleBlink() {
+    setTimeout(function () {
+      groups.forEach(function (eyes) { eyes.classList.add('is-blinking'); });
+      setTimeout(function () {
+        groups.forEach(function (eyes) { eyes.classList.remove('is-blinking'); });
+      }, 340);
+      scheduleBlink();
+    }, 1600 + Math.random() * 2600);
+  })();
+})();
+
 document.getElementById('mpopup-close').addEventListener('click', closeMachinePopup);
 
 // Click outside popup to close
