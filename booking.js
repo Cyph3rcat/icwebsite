@@ -330,6 +330,10 @@ function bkFinish() {
 
 function bkTicketSlideHTML(b, i) {
   const d = b.date;
+  const whenLabel = bkWhenLabel(d);
+  const whenClass = 'hero-ticket__when' +
+    (whenLabel === 'Next Wednesday' ? ' hero-ticket__when--long' :
+     whenLabel === 'This Wednesday' ? ' hero-ticket__when--wide' : '');
   return `
     <div class="hero-ticket__slide">
       <div class="hero-ticket__main">
@@ -348,8 +352,8 @@ function bkTicketSlideHTML(b, i) {
             <p class="v">${bkSectionText(b.hours)}</p>
           </div>
         </div>
-        <div class="hero-ticket__when">
-          <span>${bkWhenLabel(d)}</span>
+        <div class="${whenClass}">
+          <span>${whenLabel}</span>
           <img src="assets/Icon/Arrow/Ticket_deco.svg" alt="">
         </div>
         <button class="hero-ticket__more" data-index="${i}">More</button>
