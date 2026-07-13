@@ -389,6 +389,143 @@ function bkApplyHeroTicket() {
   document.querySelector('.hero').classList.add('has-ticket');
 }
 
+/* ============================================================
+   TICKET DETAIL POPUP (hero ticket "More" -> cancel booking)
+============================================================ */
+
+let tkIndex = -1; // index into bkState.bookings currently shown (-1 = none/empty state)
+
+function tkTabLabel(b) {
+  const start = Math.min(...b.hours);
+  return `${BK_MONTHS[b.date.getMonth()].slice(0, 3)} ${b.date.getDate()} Time: ${start}:00`;
+}
+
+function tkRenderTabs() {
+  const tabs = $bk('tkpop-tabs');
+  tabs.innerHTML = '<div class="tkpop-tab-indicator"></div>' +
+    bkState.bookings.map((b, i) =>
+      `<button class="tkpop-tab${i === tkIndex ? ' is-active' : ''}" data-index="${i}">${tkTabLabel(b)}</button>`
+    ).join('');
+  tabs.hidden = !bkState.bookings.length;
+  requestAnimationFrame(tkPositionIndicator);
+}
+
+function tkPositionIndicator() {
+  const ind = document.querySelector('.tkpop-tab-indicator');
+  const act = document.querySelector('.tkpop-tab.is-active');
+  if (!ind) return;
+  if (!act) { ind.style.width = '0'; return; }
+  ind.style.left = act.offsetLeft + 'px';
+  ind.style.width = act.offsetWidth + 'px';
+}
+
+/* Switching tabs (mpop-tab logic): toggle is-active on the existing buttons
+   rather than rebuilding them, so the indicator slides from its current
+   position instead of resetting to 0 and animating in from the left. */
+function tkSetActiveTab() {
+  document.querySelectorAll('.tkpop-tab').forEach(tab => {
+    tab.classList.toggle('is-active', Number(tab.dataset.index) === tkIndex);
+  });
+  requestAnimationFrame(tkPositionIndicator);
+}
+
+function tkRenderDetail() {
+  const b = bkState.bookings[tkIndex];
+  $bk('tkpop-card').hidden = !b;
+  $bk('tkpop-empty').hidden = !!b;
+  if (!b) return;
+  const data = bkMachineData[b.machine];
+  const d = b.date;
+  const start = Math.min(...b.hours), end = Math.max(...b.hours) + 1;
+  $bk('tkpop-photo').src = data.photo;
+  $bk('tkpop-machine').textContent = data.name;
+  $bk('tkpop-venue-code').textContent = data.venue;
+  $bk('tkpop-visit-rel').textContent = bkRelLabel(d);
+  $bk('tkpop-visit-date').textContent =
+    `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}`;
+  $bk('tkpop-session-total').textContent =
+    `Total ${b.hours.length} Hour${b.hours.length > 1 ? 's' : ''}`;
+  $bk('tkpop-session-time').textContent = `${start}:00 - ${end}:00`;
+}
+
+function openTicketPopup(i) {
+  tkIndex = i;
+  tkRenderTabs();
+  tkRenderDetail();
+  $bk('tkpop-scrollport').scrollTop = 0;
+  const overlay = $bk('ticket-popup');
+  overlay.classList.remove('is-closing');
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTicketPopup() {
+  tkCloseCancel();
+  const overlay = $bk('ticket-popup');
+  overlay.classList.add('is-closing');
+  overlay.setAttribute('aria-hidden', 'true');
+  setTimeout(() => {
+    overlay.classList.remove('is-open', 'is-closing');
+    document.body.style.overflow = '';
+  }, 340);
+}
+
+/* Floats the confirm panel above the cancel button, left-edge aligned, with
+   the button's top tucked under the panel so its square bottom-left corner
+   runs continuously into the button. Overlap is 18 of the button's 65.7
+   height — the button's under-confirm corner radius (see is-under-confirm) —
+   so the seam sits exactly where the top-left curve ends and the left edge
+   stays dead straight (Figma's nominal 15.3 leaves a sliver of curve
+   exposed). Measure the button only after is-under-confirm lands on it: that
+   kills any in-flight hover scale so the rect is true. */
+function tkPositionCancelPanel() {
+  const btn = $bk('tkpop-cancel-btn');
+  const panel = document.querySelector('.tkpop-cancel');
+  const btnRect = btn.getBoundingClientRect();
+  const overlap = btnRect.height * (18 / 65.7);
+  panel.style.left = `${btnRect.left}px`;
+  panel.style.top = `${btnRect.top + overlap - panel.offsetHeight}px`;
+}
+
+function tkOpenCancel() {
+  const b = bkState.bookings[tkIndex];
+  if (!b) return;
+  const d = b.date;
+  const start = Math.min(...b.hours), end = Math.max(...b.hours) + 1;
+  $bk('tkpop-cancel-machine').textContent = bkMachineData[b.machine].name;
+  $bk('tkpop-cancel-date').textContent =
+    `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}`;
+  $bk('tkpop-cancel-time').textContent = `${start}:00 - ${end}:00`;
+  $bk('tkpop-cancel-btn').classList.add('is-under-confirm');
+  tkPositionCancelPanel();
+  $bk('tkpop-cancel-overlay').classList.add('is-open');
+}
+
+function tkCloseCancel() {
+  $bk('tkpop-cancel-overlay').classList.remove('is-open');
+  $bk('tkpop-cancel-btn').classList.remove('is-under-confirm');
+}
+
+/* Confirm cancel: drop the booking, keep the popup open showing the
+   empty state (893:5785); remaining tickets stay reachable via tabs. */
+function tkConfirmCancel() {
+  const removed = bkState.bookings.splice(tkIndex, 1)[0];
+  if (bkState.lastBooked === removed) {
+    bkState.lastBooked = bkState.bookings[bkState.bookings.length - 1] || null;
+  }
+  tkIndex = -1;
+  tkCloseCancel();
+  tkRenderTabs();
+  tkRenderDetail();
+  $bk('tkpop-scrollport').scrollTop = 0;
+
+  // Sync hero carousel
+  bkState.heroIndex = Math.max(0, Math.min(bkState.heroIndex, bkState.bookings.length - 1));
+  bkRenderHeroTicket();
+  document.querySelector('.hero').classList.toggle('has-ticket', bkState.bookings.length > 0);
+}
+
 /* Called from main.js on logout: drop all bookings, restore hero */
 function bkOnLogout() {
   bkState.bookings = [];
@@ -398,6 +535,10 @@ function bkOnLogout() {
   document.querySelector('.hero').classList.remove('has-ticket');
   $bk('bk-select').classList.remove('is-open');
   $bk('bk-info').classList.remove('is-open');
+  $bk('ticket-popup').classList.remove('is-open', 'is-closing');
+  $bk('ticket-popup').setAttribute('aria-hidden', 'true');
+  tkCloseCancel();
+  tkIndex = -1;
   bkCloseCalendar();
   bkCloseConfirm();
   document.body.style.overflow = '';
@@ -457,12 +598,34 @@ $bk('hero-ticket-next').addEventListener('click', () => bkHeroGoTo(bkState.heroI
 $bk('hero-ticket-track').addEventListener('click', e => {
   const btn = e.target.closest('.hero-ticket__more');
   if (!btn) return;
-  const b = bkState.bookings[Number(btn.dataset.index)];
-  if (b) bkOpenInfo('a', b);
+  const i = Number(btn.dataset.index);
+  if (bkState.bookings[i]) openTicketPopup(i);
+});
+
+/* Ticket detail popup */
+$bk('tkpop-close').addEventListener('click', closeTicketPopup);
+$bk('ticket-popup').addEventListener('click', function (e) {
+  if (e.target === this) closeTicketPopup();
+});
+$bk('tkpop-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tkpop-tab');
+  if (!tab) return;
+  tkIndex = Number(tab.dataset.index);
+  tkSetActiveTab();
+  tkRenderDetail();
+  $bk('tkpop-scrollport').scrollTop = 0;
+});
+$bk('tkpop-cancel-btn').addEventListener('click', tkOpenCancel);
+$bk('tkpop-cancel-confirm').addEventListener('click', tkConfirmCancel);
+$bk('tkpop-cancel-return').addEventListener('click', tkCloseCancel);
+$bk('tkpop-cancel-overlay').addEventListener('click', function (e) {
+  if (e.target === this) tkCloseCancel();
 });
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if ($bk('bk-cal-overlay').classList.contains('is-open')) bkCloseCalendar();
   else if ($bk('bk-confirm-overlay').classList.contains('is-open')) bkCloseConfirm();
+  else if ($bk('tkpop-cancel-overlay').classList.contains('is-open')) tkCloseCancel();
+  else if ($bk('ticket-popup').classList.contains('is-open')) closeTicketPopup();
 });
