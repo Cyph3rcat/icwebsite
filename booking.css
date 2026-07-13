@@ -1098,9 +1098,9 @@
 .hero-ticket__meta .v { font-size: calc(26.9 * var(--hu)); }
 .hero-ticket__when {
   position: absolute;
-  right: calc(480 * var(--hu));
+  left: calc(-92 * var(--hu));
   top: calc(428 * var(--hu));
-  width: max-content;
+  width: calc(885 * var(--hu));
   height: calc(60 * var(--hu));
   background: #007ffe;
   border-radius: calc(50 * var(--hu));
@@ -1108,7 +1108,6 @@
   align-items: center;
   gap: calc(14 * var(--hu));
   padding-left: calc(574 * var(--hu));
-  padding-right: calc(28 * var(--hu));
   color: #e1ecfd;
   font-size: calc(33.6 * var(--hu));
   font-weight: 600;
@@ -1116,6 +1115,18 @@
   z-index: 1;
 }
 .hero-ticket__when img { width: calc(18 * var(--hu)); }
+/* "Next Wednesday" is the longest possible label — nudge its content left so
+   the arrow icon clears the pill's rounded cap instead of overflowing it. */
+.hero-ticket__when--long { padding-left: calc(520 * var(--hu)); }
+/* "This Wednesday" overflows past the pill's fixed right edge into the
+   "More" button — anchor by the right edge instead and let the box grow
+   leftward (clipped off-canvas by .hero-ticket__main) to fit the content. */
+.hero-ticket__when--wide {
+  left: auto;
+  right: calc(480 * var(--hu));
+  width: max-content;
+  padding-right: calc(28 * var(--hu));
+}
 .hero-ticket__more {
   position: absolute;
   left: calc(825 * var(--hu));
