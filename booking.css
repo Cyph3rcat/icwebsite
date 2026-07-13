@@ -345,7 +345,7 @@
   z-index: 0;
   transition: color .2s;
 }
-.bk-cta:hover .bk-cta-mascot { color: #0069d4; }
+.bk-cta:has(.bk-cta-btn:hover) .bk-cta-mascot { color: #0069d4; }
 .bk-cta-btn {
   position: absolute;
   left: 0;
@@ -1098,9 +1098,9 @@
 .hero-ticket__meta .v { font-size: calc(26.9 * var(--hu)); }
 .hero-ticket__when {
   position: absolute;
-  left: calc(-92 * var(--hu));
+  right: calc(480 * var(--hu));
   top: calc(428 * var(--hu));
-  width: calc(885 * var(--hu));
+  width: max-content;
   height: calc(60 * var(--hu));
   background: #007ffe;
   border-radius: calc(50 * var(--hu));
@@ -1108,6 +1108,7 @@
   align-items: center;
   gap: calc(14 * var(--hu));
   padding-left: calc(574 * var(--hu));
+  padding-right: calc(28 * var(--hu));
   color: #e1ecfd;
   font-size: calc(33.6 * var(--hu));
   font-weight: 600;
@@ -1180,4 +1181,575 @@
   font-family: 'Libre Barcode 39 Text', cursive;
   font-size: calc(41 * var(--hu));
   color: #fff;
+}
+
+
+/* ============================================================
+   TICKET DETAIL POPUP (hero ticket "More")
+   Figma node 893:5638 (detail), 893:5723 (cancel confirm),
+   893:5785 (empty state after cancel).
+   Same convention as .mpop-*: --u = 1px of the 1171px-wide
+   design frame, every dimension is the raw Figma value * --u.
+   Chrome (tabs + close) lives outside the scrollport so it
+   never moves; the card scrolls behind it.
+============================================================ */
+
+.tkpop-overlay {
+  --u: clamp(0.575px, 0.0641vw, 1.23px);
+  --tkpop-pad-top: clamp(16px, 2vh, 40px);
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  background: rgba(45, 79, 100, 0.60);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--tkpop-pad-top) clamp(12px, 2vw, 40px) 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.tkpop-overlay.is-open { opacity: 1; pointer-events: auto; }
+
+.tkpop-wrap {
+  position: relative;
+  width: calc(1171 * var(--u));
+  max-width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  transform: translateY(40px) scale(0.95);
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
+              opacity 0.3s ease;
+}
+
+.tkpop-overlay.is-open .tkpop-wrap { transform: translateY(0) scale(1); opacity: 1; }
+
+.tkpop-overlay.is-closing .tkpop-wrap {
+  transform: translateY(44px) scale(0.93);
+  opacity: 0;
+  transition: transform 0.28s ease, opacity 0.22s ease;
+}
+
+/* ---- Fixed chrome: tabs pill + close ---- */
+.tkpop-topbar {
+  position: absolute;
+  top: calc(35.1 * var(--u));
+  left: calc(49.5 * var(--u));
+  right: calc(33 * var(--u));
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  z-index: 30;
+  pointer-events: none;
+}
+.tkpop-topbar > * { pointer-events: auto; }
+
+.tkpop-tabs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: calc(4.5 * var(--u));
+  background: rgba(249, 253, 255, 0.85);
+  backdrop-filter: blur(calc(4 * var(--u)));
+  -webkit-backdrop-filter: blur(calc(4 * var(--u)));
+  border-radius: 900px;
+}
+.tkpop-tabs[hidden] { display: none; }
+
+.tkpop-tab-indicator {
+  position: absolute;
+  top: calc(4.5 * var(--u));
+  left: 0;
+  width: 0;
+  height: calc(58.5 * var(--u));
+  background: #85b7ff;
+  border-radius: 900px;
+  pointer-events: none;
+  transition: left 0.38s cubic-bezier(0.59, -0.33, 0.36, 1.26),
+              width 0.38s cubic-bezier(0.59, -0.33, 0.36, 1.26);
+}
+
+.tkpop-tab {
+  position: relative;
+  z-index: 1;
+  height: calc(58.5 * var(--u));
+  padding: 0 calc(21 * var(--u));
+  border: none;
+  background: none;
+  border-radius: 900px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: calc(18.23 * var(--u));
+  font-weight: 500;
+  color: #4d7187;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.tkpop-tab.is-active { color: #f9fdff; }
+
+.tkpop-close {
+  position: relative;
+  width: calc(67.86 * var(--u));
+  height: calc(67.86 * var(--u));
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto; /* stays right even when the tabs pill is hidden */
+  transition: transform 0.35s cubic-bezier(0.59, -0.33, 0.36, 1.26);
+}
+.tkpop-close:hover { transform: rotate(90deg) scale(1.08); }
+
+.tkpop-close__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.tkpop-close__img--hover { opacity: 0; }
+.tkpop-close:hover .tkpop-close__img--default { opacity: 0; }
+.tkpop-close:hover .tkpop-close__img--hover { opacity: 1; }
+
+/* ---- Scroll viewport ---- */
+.tkpop-scrollport {
+  position: absolute;
+  top: calc(-1 * var(--tkpop-pad-top));
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tkpop-scrollport::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* ---- Card (whole frame scrolls; chrome floats above it) ---- */
+.tkpop-card {
+  margin-top: var(--tkpop-pad-top);
+  min-height: calc(100% - var(--tkpop-pad-top));
+  background: #e8eef0;
+  border-radius: calc(25.92 * var(--u)) calc(25.92 * var(--u)) 0 0;
+  padding: calc(145.8 * var(--u)) calc(49.5 * var(--u)) calc(49.5 * var(--u));
+}
+.tkpop-card[hidden] { display: none; }
+
+/* ---- Empty state (893:5785) ---- */
+.tkpop-empty {
+  margin-top: var(--tkpop-pad-top);
+  height: calc(100% - var(--tkpop-pad-top));
+  background: #e8eef0;
+  border-radius: calc(25.92 * var(--u)) calc(25.92 * var(--u)) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tkpop-empty[hidden] { display: none; }
+.tkpop-empty p {
+  margin: 0;
+  font-size: calc(35 * var(--u));
+  font-weight: 500;
+  color: #4d7187;
+}
+
+/* ---- Top grid: machine card + visit/session ---- */
+.tkpop-top-grid {
+  display: grid;
+  grid-template-columns: calc(572.4 * var(--u)) 1fr;
+  grid-template-rows: calc(199.8 * var(--u)) calc(217.8 * var(--u));
+  gap: calc(40.5 * var(--u)) calc(26.1 * var(--u));
+}
+
+.tkpop-machine-card {
+  position: relative;
+  grid-row: 1 / 3;
+  border-radius: calc(32.4 * var(--u));
+  overflow: hidden;
+  background: #f6f6f7;
+}
+.tkpop-machine-card > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tkpop-machine-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(21.6 * var(--u));
+  height: calc(127.8 * var(--u));
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.39), rgba(255, 255, 255, 0.39)),
+    linear-gradient(90deg, #f6f6f7 0%, rgba(255, 255, 255, 0) 100%);
+  backdrop-filter: blur(calc(1.8 * var(--u)));
+  -webkit-backdrop-filter: blur(calc(1.8 * var(--u)));
+}
+.tkpop-machine-name {
+  position: absolute;
+  margin: 0;
+  left: calc(36.9 * var(--u));
+  top: calc(53.1 * var(--u));
+  font-size: calc(42.41 * var(--u));
+  font-weight: 600;
+  color: #204b66;
+  white-space: nowrap;
+}
+.tkpop-cancel-btn {
+  position: absolute;
+  left: calc(19.45 * var(--u));
+  bottom: calc(13.65 * var(--u));
+  width: calc(214.2 * var(--u));
+  height: calc(65.7 * var(--u));
+  border: none;
+  border-radius: calc(101 * var(--u));
+  background: #eb5348;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: calc(18.23 * var(--u));
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.tkpop-cancel-btn:hover { background: #d9453a; transform: scale(1.03); }
+
+.tkpop-info-card {
+  position: relative;
+  background: #f6f6f7;
+  border-radius: calc(32.4 * var(--u));
+  padding: calc(17.1 * var(--u)) calc(36.9 * var(--u)) calc(15 * var(--u));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.tkpop-info-card p { margin: 0; white-space: nowrap; }
+.tkpop-info-card .h {
+  font-size: calc(37 * var(--u));
+  font-weight: 600;
+  color: #204b66;
+}
+.tkpop-info-card .sub { font-size: calc(17.1 * var(--u)); color: #4d7187; }
+.tkpop-info-card .big {
+  font-size: calc(37 * var(--u));
+  font-weight: 500;
+  color: #4d7187;
+}
+
+/* ---- Venue card ---- */
+.tkpop-venue-card {
+  position: relative;
+  margin-top: calc(34.2 * var(--u));
+  height: calc(487.8 * var(--u));
+  border-radius: calc(32.4 * var(--u));
+  overflow: hidden;
+  background: #f6f6f7;
+}
+.tkpop-venue-card > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tkpop-venue-band {
+  position: absolute;
+  left: 0;
+  top: calc(54 * var(--u));
+  width: calc(319.5 * var(--u));
+  height: calc(104.4 * var(--u));
+  background: linear-gradient(90deg, #f6f6f7 0%, rgba(255, 255, 255, 0) 100%);
+  backdrop-filter: blur(calc(1.8 * var(--u)));
+  -webkit-backdrop-filter: blur(calc(1.8 * var(--u)));
+}
+.tkpop-venue-card p {
+  position: absolute;
+  margin: 0;
+  left: calc(37.8 * var(--u));
+  white-space: nowrap;
+}
+.tkpop-venue-card .sub {
+  top: calc(65.7 * var(--u));
+  font-size: calc(27 * var(--u));
+  color: #4d7187;
+}
+.tkpop-venue-card .h {
+  top: calc(100.8 * var(--u));
+  font-size: calc(37 * var(--u));
+  font-weight: 600;
+  color: #204b66;
+}
+
+/* ---- Section headings ---- */
+.tkpop-heading {
+  margin: 0;
+  font-size: calc(31.5 * var(--u));
+  font-weight: 500;
+  color: #204b66;
+}
+.tkpop-heading--reminder { margin-top: calc(31.5 * var(--u)); }
+.tkpop-heading--prepare { margin-top: calc(53.1 * var(--u)); }
+.tkpop-heading--arrive {
+  margin-top: calc(52.8 * var(--u));
+  font-size: calc(37.7 * var(--u));
+  color: #4d7187;
+}
+
+/* ---- Reminder cards ---- */
+.tkpop-reminder-row {
+  display: flex;
+  gap: calc(47.7 * var(--u));
+  margin-top: calc(12.4 * var(--u));
+}
+.tkpop-rem-card {
+  position: relative;
+  height: calc(278.1 * var(--u));
+  border-radius: calc(27 * var(--u));
+  background: #f6f6f7;
+  overflow: hidden;
+}
+.tkpop-rem-card--print { width: calc(690.3 * var(--u)); }
+.tkpop-rem-card--model { width: calc(329.4 * var(--u)); }
+.tkpop-rem-card > img {
+  position: absolute;
+  left: calc(266.4 * var(--u));
+  top: 0;
+  width: calc(423.9 * var(--u));
+  height: 100%;
+  object-fit: cover;
+}
+.tkpop-rem-fade {
+  position: absolute;
+  left: calc(266.4 * var(--u));
+  top: 0;
+  width: calc(282.6 * var(--u));
+  height: 100%;
+  background: linear-gradient(90deg, #fcfcff 0%, rgba(252, 252, 255, 0) 100%);
+}
+.tkpop-rem-card p { position: absolute; margin: 0; left: calc(27 * var(--u)); }
+.tkpop-rem-card .h {
+  top: calc(18.9 * var(--u));
+  font-size: calc(31.5 * var(--u));
+  font-weight: 500;
+  color: #204b66;
+  white-space: nowrap;
+}
+.tkpop-rem-card .d {
+  top: calc(76.5 * var(--u));
+  width: calc(311.4 * var(--u));
+  font-size: calc(18 * var(--u));
+  line-height: 1.5;
+  color: #4d7187;
+}
+.tkpop-rem-card--model .d { width: calc(231.3 * var(--u)); }
+
+/* ---- What to prepare ---- */
+.tkpop-prepare-row {
+  display: flex;
+  gap: calc(47.7 * var(--u));
+  margin-top: calc(24.1 * var(--u));
+}
+.tkpop-prep-card {
+  width: calc(324 * var(--u));
+  height: calc(278.1 * var(--u));
+  background: #f6f6f7;
+  border-radius: calc(27 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: calc(46.8 * var(--u));
+}
+.tkpop-prep-card img {
+  width: calc(148.5 * var(--u));
+  height: calc(148.5 * var(--u));
+  object-fit: contain;
+}
+.tkpop-prep-card p {
+  margin: 0;
+  font-size: calc(24.3 * var(--u));
+  color: #204b66;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ---- Arriving steps ---- */
+.tkpop-steps {
+  display: flex;
+  flex-direction: column;
+  gap: calc(20.3 * var(--u));
+  margin-top: calc(24 * var(--u));
+}
+.tkpop-steps-row { display: flex; gap: calc(17.8 * var(--u)); }
+.tkpop-step {
+  position: relative;
+  overflow: hidden;
+  flex: 1 1 0;
+  height: calc(168 * var(--u));
+  border-radius: calc(14.5 * var(--u));
+}
+.tkpop-step--wide { height: calc(168.4 * var(--u)); }
+.tkpop-step--round-tr { border-top-right-radius: calc(106.6 * var(--u)); }
+.tkpop-step--round-br { border-bottom-right-radius: calc(106.6 * var(--u)); }
+.tkpop-step > img.bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tkpop-step-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(58, 60, 72, 0.88), rgba(76, 78, 91, 0) 75%);
+}
+.tkpop-step p {
+  margin: 0;
+  position: absolute;
+  left: calc(17 * var(--u));
+  color: #fff;
+}
+.tkpop-step .step-n { top: calc(13 * var(--u)); font-size: calc(16 * var(--u)); }
+.tkpop-step .step-h {
+  top: calc(33.8 * var(--u));
+  font-size: calc(21 * var(--u));
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tkpop-step .step-d {
+  top: calc(113.7 * var(--u));
+  width: calc(258 * var(--u));
+  font-size: calc(16 * var(--u));
+  line-height: 1.4;
+}
+.tkpop-step--wide .step-d { width: calc(386 * var(--u)); }
+.tkpop-step .step-d b { font-weight: 600; }
+.tkpop-step .arr {
+  position: absolute;
+  right: calc(24.3 * var(--u));
+  top: calc(16.3 * var(--u));
+  width: calc(27.7 * var(--u));
+  height: calc(29.1 * var(--u));
+}
+.tkpop-step .arr--down {
+  top: auto;
+  bottom: calc(13.8 * var(--u));
+  transform: rotate(90deg);
+}
+.tkpop-step .arr--left { transform: rotate(180deg); }
+
+/* ---- Cancel-booking confirmation (893:5723) ----
+   Floats above the cancel button (positioned via JS in tkOpenCancel) instead
+   of a centered modal, so the page behind stays undarkened; the overlay is
+   just a full-viewport click-catcher for outside-click-to-close. */
+.tkpop-cancel-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.tkpop-cancel-overlay.is-open { opacity: 1; pointer-events: auto; }
+
+.tkpop-cancel {
+  position: fixed;
+  width: calc(530.1 * var(--u));
+  height: calc(371.1 * var(--u));
+  background: #ef574c;
+  border-radius: calc(32.4 * var(--u)) calc(32.4 * var(--u)) calc(32.4 * var(--u)) 0;
+  color: #fff;
+  transform-origin: bottom left;
+  transform: translateY(10px) scale(0.85);
+  opacity: 0;
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.22s ease;
+}
+.tkpop-cancel-overlay.is-open .tkpop-cancel { transform: translateY(0) scale(1); opacity: 1; }
+
+.tkpop-cancel p { position: absolute; margin: 0; white-space: nowrap; }
+.tkpop-cancel-title {
+  left: calc(48.6 * var(--u));
+  top: calc(21.6 * var(--u));
+  font-size: calc(29.87 * var(--u));
+  font-weight: 600;
+}
+.tkpop-cancel-sub {
+  left: calc(48.6 * var(--u));
+  top: calc(62.1 * var(--u));
+  font-size: calc(18.91 * var(--u));
+}
+.tkpop-cancel-line {
+  position: absolute;
+  left: calc(40 * var(--u));
+  top: calc(123.75 * var(--u));
+  width: calc(405.45 * var(--u));
+  margin: 0;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.9);
+}
+.tkpop-cancel-machine {
+  left: calc(38.7 * var(--u));
+  top: calc(140.4 * var(--u));
+  font-size: calc(32.74 * var(--u));
+  font-weight: 600;
+}
+.tkpop-cancel-date {
+  left: calc(38.7 * var(--u));
+  top: calc(189 * var(--u));
+  font-size: calc(22.63 * var(--u));
+  font-weight: 500;
+}
+.tkpop-cancel-time {
+  left: calc(38.7 * var(--u));
+  top: calc(223.1 * var(--u));
+  font-size: calc(22.63 * var(--u));
+  font-weight: 500;
+}
+.tkpop-cancel-confirm,
+.tkpop-cancel-return {
+  position: absolute;
+  top: calc(279.9 * var(--u));
+  width: calc(217.8 * var(--u));
+  height: calc(51.3 * var(--u));
+  border: none;
+  border-radius: calc(90.7 * var(--u));
+  font-family: 'Poppins', sans-serif;
+  font-size: calc(16.38 * var(--u));
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.2s;
+}
+.tkpop-cancel-confirm:hover,
+.tkpop-cancel-return:hover { filter: brightness(0.92); transform: scale(1.03); }
+.tkpop-cancel-confirm {
+  left: calc(40.5 * var(--u));
+  background: #007fff;
+  color: #fff;
+}
+.tkpop-cancel-return {
+  left: calc(271.8 * var(--u));
+  background: #d9e5ff;
+  color: #000;
+}
+
+/* While the confirm panel is open the button's top is hidden under it, so it
+   must read as part of the panel: same red as .tkpop-cancel, no hover
+   motion/recolor, and no transition so tkPositionCancelPanel measures the
+   untransformed rect. */
+.tkpop-cancel-btn.is-under-confirm,
+.tkpop-cancel-btn.is-under-confirm:hover {
+  background: #ef574c;
+  border-radius: calc(18 * var(--u)); /* 893:5721: not a pill in this state; the
+    18u corner is shallow enough to hide fully under the panel overlap */
+  transform: none;
+  transition: none;
+  cursor: default;
 }

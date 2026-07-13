@@ -872,6 +872,154 @@
   </div>
 </div>
 
+<!-- TICKET DETAIL POPUP (hero ticket "More") ==================== -->
+<div id="ticket-popup" class="tkpop-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="tkpop-wrap">
+
+    <!-- Fixed chrome: ticket tabs + close (never scroll) -->
+    <div class="tkpop-topbar">
+      <div class="tkpop-tabs" id="tkpop-tabs"></div>
+      <button class="tkpop-close" id="tkpop-close" aria-label="Close">
+        <img class="tkpop-close__img tkpop-close__img--default" src="assets/Icon/Suggest/Property 1=Close_default.svg" alt="">
+        <img class="tkpop-close__img tkpop-close__img--hover" src="assets/Icon/Suggest/Property 1=Close_hover.svg" alt="">
+      </button>
+    </div>
+
+    <!-- Scroll viewport: card scrolls behind the fixed chrome -->
+    <div class="tkpop-scrollport" id="tkpop-scrollport">
+      <div class="tkpop-card" id="tkpop-card">
+
+        <div class="tkpop-top-grid">
+          <div class="tkpop-machine-card">
+            <img id="tkpop-photo" src="assets/booking/booking_photo.jpg" alt="">
+            <div class="tkpop-machine-band"></div>
+            <p class="tkpop-machine-name" id="tkpop-machine">Bambu X1 Carbon</p>
+            <button class="tkpop-cancel-btn" id="tkpop-cancel-btn">Cancel booking</button>
+          </div>
+          <div class="tkpop-info-card">
+            <p class="h">Visit Date</p>
+            <div class="foot">
+              <p class="sub" id="tkpop-visit-rel">2 Day later</p>
+              <p class="big" id="tkpop-visit-date">Dec 17 Thursday</p>
+            </div>
+          </div>
+          <div class="tkpop-info-card">
+            <p class="h">Session</p>
+            <div class="foot">
+              <p class="sub" id="tkpop-session-total">Total 1 Hours</p>
+              <p class="big" id="tkpop-session-time">10:00 - 11:00</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tkpop-venue-card">
+          <img src="assets/booking/venue_w503.jpg" alt="Venue W503">
+          <div class="tkpop-venue-band"></div>
+          <p class="sub" id="tkpop-venue-code">W503</p>
+          <p class="h">Venue</p>
+        </div>
+
+        <p class="tkpop-heading tkpop-heading--reminder">Reminder</p>
+        <div class="tkpop-reminder-row">
+          <div class="tkpop-rem-card tkpop-rem-card--print">
+            <img src="assets/booking/print_setting.jpg" alt="">
+            <div class="tkpop-rem-fade"></div>
+            <p class="h">Print Setting</p>
+            <p class="d">The model should be on the printing surface.</p>
+          </div>
+          <div class="tkpop-rem-card tkpop-rem-card--model">
+            <p class="h">3D model</p>
+            <p class="d">Should be closed surface</p>
+          </div>
+        </div>
+
+        <p class="tkpop-heading tkpop-heading--prepare">What to prepare to IE Maker Lab</p>
+        <div class="tkpop-prepare-row">
+          <div class="tkpop-prep-card">
+            <img src="assets/Icon/Machine Feature/STL_file.svg" alt="">
+            <p>STL file</p>
+          </div>
+          <div class="tkpop-prep-card">
+            <img src="assets/Icon/Machine Feature/USB.svg" alt="">
+            <p>USB</p>
+          </div>
+          <div class="tkpop-prep-card">
+            <img src="assets/Icon/Machine Feature/Cash.svg" alt="">
+            <p>Cash or Octopus Card</p>
+          </div>
+        </div>
+
+        <p class="tkpop-heading tkpop-heading--arrive">Arriving IE Maker Lab</p>
+        <div class="tkpop-steps">
+          <div class="tkpop-steps-row">
+            <div class="tkpop-step">
+              <img class="bg" src="assets/booking/step1.jpg" alt="">
+              <div class="tkpop-step-shade"></div>
+              <p class="step-n">Step 1</p>
+              <p class="step-h">Pick Machine</p>
+              <p class="step-d">Scan <b>student ID card</b> and choose the available machine</p>
+              <img class="arr" src="assets/booking/arrow_forward.svg" alt="">
+            </div>
+            <div class="tkpop-step">
+              <img class="bg" src="assets/booking/step2.jpg" alt="">
+              <div class="tkpop-step-shade"></div>
+              <p class="step-n">Step 2</p>
+              <p class="step-h">Slicing</p>
+              <p class="step-d"><b>Input the file</b> in bambu software and <b>adjust the support and thickness of layer</b></p>
+              <img class="arr" src="assets/booking/arrow_forward.svg" alt="">
+            </div>
+            <div class="tkpop-step tkpop-step--round-tr">
+              <img class="bg" src="assets/booking/step3.jpg" alt="">
+              <div class="tkpop-step-shade"></div>
+              <p class="step-n">Step 3</p>
+              <p class="step-h">Import to Printer</p>
+              <p class="step-d">Input the file into the <b>SD card</b> of machine and start printing</p>
+              <img class="arr arr--down" src="assets/booking/arrow_forward.svg" alt="">
+            </div>
+          </div>
+          <div class="tkpop-steps-row">
+            <div class="tkpop-step tkpop-step--wide">
+              <img class="bg" src="assets/booking/step5.jpg" alt="">
+              <div class="tkpop-step-shade"></div>
+              <p class="step-n">Step 5</p>
+              <p class="step-h">Pay for service</p>
+              <p class="step-d"><b>Pay at 3/F general office</b> after getting the model</p>
+            </div>
+            <div class="tkpop-step tkpop-step--wide tkpop-step--round-br">
+              <img class="bg" src="assets/booking/step4.jpg" alt="">
+              <div class="tkpop-step-shade"></div>
+              <p class="step-n">Step 4</p>
+              <p class="step-h">Write Record Paper for record</p>
+              <p class="step-d"><b>Finish the record paper</b> and put it in the box on the machine. Then wait for the model</p>
+              <img class="arr arr--left" src="assets/booking/arrow_forward.svg" alt="">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Empty state shown after the open ticket is cancelled -->
+      <div class="tkpop-empty" id="tkpop-empty" hidden>
+        <p>No upcoming booking</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel-booking confirmation -->
+  <div class="tkpop-cancel-overlay" id="tkpop-cancel-overlay">
+    <div class="tkpop-cancel" role="alertdialog" aria-label="Confirm cancel booking">
+      <p class="tkpop-cancel-title">Cancel Booking</p>
+      <p class="tkpop-cancel-sub">Confirm cancel booking</p>
+      <hr class="tkpop-cancel-line">
+      <p class="tkpop-cancel-machine" id="tkpop-cancel-machine">Bambu X1 Carbon</p>
+      <p class="tkpop-cancel-date" id="tkpop-cancel-date">Dec 28 Monday</p>
+      <p class="tkpop-cancel-time" id="tkpop-cancel-time">12:00 - 13:00</p>
+      <button class="tkpop-cancel-confirm" id="tkpop-cancel-confirm">Confirm</button>
+      <button class="tkpop-cancel-return" id="tkpop-cancel-return">Return</button>
+    </div>
+  </div>
+</div>
+
 <script src="main.js"></script>
 <script src="booking.js"></script>
 </body>
