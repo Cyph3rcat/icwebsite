@@ -1,5 +1,6 @@
-# IC MakerLab – Booking (front end)
+# IE Maker lab Website
 
+Designed by students of the Hong Kong Polytechnic University to book the facilities available in the *Industrial Centre*. This repo is the booking front end: static HTML/CSS/JS, no build step.
 Static HTML/CSS/JS, no build step.
 
 ## Running locally
