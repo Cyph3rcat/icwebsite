@@ -2,6 +2,7 @@ import {
   LoggedIn, isMobileDevice, openMachinePopup, closeMachinePopup,
   openMobileMachinePopup, closeMobileMachinePopup, updateMlistCta,
 } from './main.js';
+import { loadBookings, saveBookings } from './store.js';
 
 const bkMachineData = {
   bambu: {
@@ -275,6 +276,7 @@ function bkCommitBooking() {
   };
   bkState.bookings.push(booking);
   bkState.lastBooked = booking;
+  saveBookings(bkState.bookings);
   return booking;
 }
 
@@ -518,6 +520,7 @@ function tkCloseCancel() {
 
 function tkConfirmCancel() {
   const removed = bkState.bookings.splice(tkIndex, 1)[0];
+  saveBookings(bkState.bookings);
   if (bkState.lastBooked === removed) {
     bkState.lastBooked = bkState.bookings[bkState.bookings.length - 1] || null;
   }
@@ -532,8 +535,15 @@ function tkConfirmCancel() {
   document.querySelector('.hero').classList.toggle('has-ticket', bkState.bookings.length > 0);
 }
 
+function bkRestoreBookings() {
+  bkState.bookings = loadBookings();
+  bkState.lastBooked = bkState.bookings[bkState.bookings.length - 1] || null;
+  if (!isMobileDevice()) bkApplyHeroTicket();
+}
+
 function bkOnLogout() {
   bkState.bookings = [];
+  saveBookings([]);
   bkState.lastBooked = null;
   bkState.heroIndex = 0;
   $bk('hero-ticket-track').innerHTML = '';
@@ -786,6 +796,7 @@ function bkpCloseCancelPanel() {
 
 function bkpConfirmCancel() {
   const removed = bkState.bookings.splice(bkpMgrIndex, 1)[0];
+  saveBookings(bkState.bookings);
   if (bkState.lastBooked === removed) {
     bkState.lastBooked = bkState.bookings[bkState.bookings.length - 1] || null;
   }
@@ -924,4 +935,4 @@ document.addEventListener('keydown', e => {
   else if ($bk('ticket-popup').classList.contains('is-open')) closeTicketPopup();
 });
 
-export { bkState, bkOnLogout, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow };
+export { bkState, bkOnLogout, bkRestoreBookings, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow };

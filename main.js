@@ -1,6 +1,9 @@
-import { bkState, bkOnLogout, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow } from './booking.js';
+import {
+  bkState, bkOnLogout, bkRestoreBookings, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow,
+} from './booking.js';
+import { loadLogin, saveLogin } from './store.js';
 
-var LoggedIn = false;
+let LoggedIn = loadLogin();
 
 const machineTrainingData = {
   printer: {
@@ -53,6 +56,7 @@ document.getElementById('login/out-btn').addEventListener('click', function () {
     doLogin();
   } else {
     LoggedIn = false;
+    saveLogin(false);
     loggedOutStatus();
     refreshLoginDependentButtons();
   }
@@ -173,6 +177,7 @@ function loggedOutStatus() {
 
 function doLogin() {
   LoggedIn = true;
+  saveLogin(true);
   loggedinStatus("2502838D");
   document.querySelectorAll('.badge-training').forEach(badge => {
     badge.textContent = 'Training Required ⓘ';
@@ -1133,6 +1138,12 @@ document.getElementById('bkp-manage-overlay').addEventListener('click', function
 document.getElementById('bkp-manage-cancel-overlay').addEventListener('click', function (e) {
   if (e.target === this) bkpCloseCancelPanel();
 });
+
+if (LoggedIn) {
+  setDemoTrainingStatus();
+  bkRestoreBookings();
+  refreshLoginDependentButtons();
+}
 
 export {
   LoggedIn,
