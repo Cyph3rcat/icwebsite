@@ -1,9 +1,9 @@
 import {
-  bkState, bkOnLogout, bkRestoreBookings, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow,
+  bkState, bkOnLogout, bkLoadBookings, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow,
 } from './booking.js';
-import { loadLogin, saveLogin } from './store.js';
+import { getSession, login, logout, getTrainingStatus } from './api.js';
 
-let LoggedIn = loadLogin();
+let LoggedIn = false;
 
 const machineTrainingData = {
   printer: {
@@ -43,10 +43,6 @@ updateHeaderHeight();
 const ctaPath_lg = document.querySelector('#login-btn-text-lg').getAttribute('d');
 const ctaPath_sm = document.querySelector('#login-btn-text-sm').getAttribute('d');
 
-if (LoggedIn) {
-  loggedinStatus("2502838D");
-}
-
 if (currentActive) {
   moveSelectorTo(currentActive);
 }
@@ -55,8 +51,8 @@ document.getElementById('login/out-btn').addEventListener('click', function () {
   if (!LoggedIn) {
     doLogin();
   } else {
+    logout();
     LoggedIn = false;
-    saveLogin(false);
     loggedOutStatus();
     refreshLoginDependentButtons();
   }
@@ -175,16 +171,32 @@ function loggedOutStatus() {
   bkOnLogout();
 }
 
-function doLogin() {
+// On the live site login() redirects to PolyU SSO, which returns to this page
+async function doLogin() {
+  await login();
+  await startSession();
+}
+
+async function startSession() {
+  let session;
+  try {
+    session = await getSession();
+  } catch (err) {
+    console.error('Session check failed', err);
+    return;
+  }
+  if (!session.loggedIn) return;
+
   LoggedIn = true;
-  saveLogin(true);
-  loggedinStatus("2502838D");
-  document.querySelectorAll('.badge-training').forEach(badge => {
-    badge.textContent = 'Training Required ⓘ';
-    badge.classList.remove('passed', 'notpass');
-  });
-  setTimeout(setDemoTrainingStatus, 1500);
+  loggedinStatus(session.userId);
   refreshLoginDependentButtons();
+  try {
+    await bkLoadBookings();
+  } catch (err) {
+    console.error('Could not load bookings', err);
+  }
+  refreshLoginDependentButtons();
+  setTrainingBadges(await getTrainingStatus());
 }
 
 function refreshLoginDependentButtons() {
@@ -193,19 +205,14 @@ function refreshLoginDependentButtons() {
   updateMlistCta();
 }
 
-function setDemoTrainingStatus() {
-  const demoStatus = {
-    printer: { text: 'Training Passed ✓',   cls: 'passed'  },
-    laser:   { text: 'Training Passed ✓',   cls: 'passed'  },
-    uv:      { text: 'Training Required ✗', cls: 'notpass' },
-    scanner: { text: 'Training Required ✗', cls: 'notpass' },
-  };
-  Object.entries(demoStatus).forEach(([id, s]) => {
+// status: { printer: true, ... }, keyed by machine section id
+function setTrainingBadges(status) {
+  Object.entries(status).forEach(([id, passed]) => {
     const badge = document.querySelector(`#${id} .badge-training`);
     if (!badge) return;
-    badge.textContent = s.text;
+    badge.textContent = passed ? 'Training Passed ✓' : 'Training Required ✗';
     badge.classList.remove('passed', 'notpass');
-    badge.classList.add(s.cls);
+    badge.classList.add(passed ? 'passed' : 'notpass');
   });
 }
 
@@ -774,10 +781,7 @@ document.getElementById('mpopup-booknow').addEventListener('click', function () 
     return;
   }
   // Only Bambu has a booking flow so far
-  if (currentMachineKey === 'bambu') {
-    closeMachinePopup();
-    openBookingFlow(currentMachineKey);
-  }
+  if (currentMachineKey === 'bambu') openBookingFlow(currentMachineKey);
 });
 
 // Mascot eyes follow the cursor and blink occasionally
@@ -1041,10 +1045,7 @@ document.getElementById('mpopm-cta').addEventListener('click', function () {
     return;
   }
   // Only Bambu has a booking flow so far
-  if (currentMachineKey === 'bambu') {
-    closeMachinePopup();
-    openBookingFlow(currentMachineKey);
-  }
+  if (currentMachineKey === 'bambu') openBookingFlow(currentMachineKey);
 });
 
 // Drag the handle down to dismiss the sheet
@@ -1139,11 +1140,7 @@ document.getElementById('bkp-manage-cancel-overlay').addEventListener('click', f
   if (e.target === this) bkpCloseCancelPanel();
 });
 
-if (LoggedIn) {
-  setDemoTrainingStatus();
-  bkRestoreBookings();
-  refreshLoginDependentButtons();
-}
+startSession();
 
 export {
   LoggedIn,
@@ -1153,4 +1150,5 @@ export {
   openMobileMachinePopup,
   closeMobileMachinePopup,
   updateMlistCta,
+  openTrainingModal,
 };

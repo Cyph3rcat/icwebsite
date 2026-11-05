@@ -1,16 +1,19 @@
 import {
   LoggedIn, isMobileDevice, openMachinePopup, closeMachinePopup,
-  openMobileMachinePopup, closeMobileMachinePopup, updateMlistCta,
+  openMobileMachinePopup, closeMobileMachinePopup, updateMlistCta, openTrainingModal,
 } from './main.js';
-import { loadBookings, saveBookings } from './store.js';
+import { ApiError, NOT_TRAINED, getAvailability, listBookings, createBookings, cancelBooking } from './api.js';
 
+// printerType is matched against the backend's printer_type names
 const bkMachineData = {
   bambu: {
     name: 'Bambu X1 Carbon',
+    printerType: /bambu/i,
     venue: 'W503',
     photo: 'assets/booking/booking_photo.jpg',
   },
 };
+const BK_FALLBACK_MACHINE = { venue: 'W503', photo: 'assets/booking/booking_photo.jpg' };
 
 const BK_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'];
@@ -28,11 +31,55 @@ function bkIsoWeek(d) {
   const jan1 = new Date(t.getFullYear(), 0, 1);
   return Math.ceil(((t - jan1) / 86400000 + 1) / 7);
 }
-function bkIsBookable(d) { return !bkIsWeekend(d) && d >= bkToday(); }
+function bkYmd(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function bkParseYmd(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function bkEsc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// Availability for the machine being booked, from printerStatus.php
+let bkAvail = null; // { printerType, dates: sorted ['YYYY-MM-DD'], sessions: [{ date, id, label, status }] }
+
+function bkIsBookable(d) { return !!bkAvail && bkAvail.dates.includes(bkYmd(d)); }
 function bkFirstBookable(from) {
-  let d = new Date(from);
-  while (!bkIsBookable(d)) d = bkAddDays(d, 1);
-  return d;
+  const first = bkAvail && bkAvail.dates.find(s => s >= bkYmd(from));
+  return first ? bkParseYmd(first) : null;
+}
+function bkLastBookable() {
+  return bkAvail && bkAvail.dates.length ? bkParseYmd(bkAvail.dates[bkAvail.dates.length - 1]) : bkToday();
+}
+function bkSlotsFor(d) {
+  const ymd = bkYmd(d);
+  return bkAvail ? bkAvail.sessions.filter(s => s.date === ymd) : [];
+}
+function bkSelectedSlots() {
+  return bkSlotsFor(bkState.date).filter(s => bkState.slots.includes(s.id));
+}
+function bkSetDate(d) {
+  bkState.date = d;
+  const first = bkSlotsFor(d).find(s => s.status === 'Available');
+  bkState.slots = first ? [first.id] : [];
+}
+
+// "08:30 - 12:30" -> 4; sessions ending at or before their start run overnight
+function bkSlotHours(label) {
+  const [start, end] = label.split('-').map(t => {
+    const [h, m] = t.trim().split(':').map(Number);
+    return h * 60 + m;
+  });
+  const mins = end > start ? end - start : end + 24 * 60 - start;
+  return Math.round(mins / 6) / 10;
+}
+function bkSlotStart(label) { return label.split('-')[0].trim(); }
+function bkHoursText(h) { return `${h} Hour${h === 1 ? '' : 's'}`; }
+
+function bkMachineKeyFor(printerType) {
+  return Object.keys(bkMachineData).find(k => bkMachineData[k].printerType.test(printerType)) || null;
+}
+function bkMachineInfo(b) {
+  return bkMachineData[b.machine] || { ...BK_FALLBACK_MACHINE, name: b.printerType };
 }
 function bkWhenLabel(d) {
   const days = Math.round((d - bkToday()) / 86400000);
@@ -49,23 +96,28 @@ function bkRelLabel(d) {
   if (days === 0) return 'Today';
   return days + (days === 1 ? ' Day later' : ' Days later');
 }
-function bkSectionText(hours) {
-  const start = Math.min(...hours), end = Math.max(...hours) + 1, n = hours.length;
-  return `${start}:00 - ${end}:00 (${n} hour${n > 1 ? 's' : ''})`;
+// slots: objects with a `label` (selected sessions or bookings)
+function bkSectionText(slots) {
+  if (!slots.length) return 'No session selected';
+  const hours = slots.reduce((n, s) => n + bkSlotHours(s.label), 0);
+  const time = slots.length === 1 ? slots[0].label : `${slots.length} Sessions`;
+  return `${time} (${bkHoursText(hours)})`;
+}
+function bkDayText(d) {
+  return `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}`;
 }
 
-const BK_SLOT_HOURS = [9, 10, 11, 14, 15, 16];
-const BK_AVAILABLE = { 9: true, 10: true, 11: true, 14: true, 15: false, 16: false };
-const BK_MAX_HOURS = 3;
+const BK_MAX_SLOTS = 3;
 
 const bkState = {
   machine: 'bambu',
   date: null,
-  hours: [9], // contiguous start hours
-  bookings: [], // { machine, date, hours }
+  slots: [], // selected timeslot IDs on `date`
+  bookings: [], // { id, machine, printerType, date, slotId, label, canCancel }
   lastBooked: null,
   heroIndex: 0,
 };
+let bkBusy = false;
 let bkWeekStart = null;
 let bkCalMonth = null;
 let bkCalPick = null;
@@ -77,11 +129,37 @@ const $bk = id => document.getElementById(id);
    SELECT SECTION VIEW
 ============================================================ */
 
-function openBookingFlow(machineKey) {
-  if (!bkMachineData[machineKey]) return;
+async function bkLoadAvailability(machine) {
+  const data = await getAvailability();
+  const printer = data.printers.find(p => machine.printerType.test(p.type));
+  if (!printer) throw new ApiError(`${machine.name} is not open for booking right now.`);
+  bkAvail = {
+    printerType: printer.type,
+    sessions: printer.sessions,
+    dates: [...new Set(printer.sessions.map(s => s.date))].sort(),
+  };
+}
+
+async function openBookingFlow(machineKey) {
+  const machine = bkMachineData[machineKey];
+  if (!machine || bkBusy) return;
+  bkBusy = true;
+  try {
+    await bkLoadAvailability(machine);
+  } catch (err) {
+    closeMachinePopup();
+    if (err.message === NOT_TRAINED) openTrainingModal('printer');
+    else alert(err.message);
+    return;
+  } finally {
+    bkBusy = false;
+  }
+  const first = bkFirstBookable(bkToday());
+  if (!first) { alert('No dates are open for booking right now.'); return; }
+
+  closeMachinePopup();
   bkState.machine = machineKey;
-  bkState.date = bkFirstBookable(bkToday());
-  bkState.hours = [BK_SLOT_HOURS.find(h => BK_AVAILABLE[h])];
+  bkSetDate(first);
   if (isMobileDevice()) { bkpOpenSelect(); return; }
   bkWeekStart = bkMonday(bkState.date);
   bkRenderSelect();
@@ -105,6 +183,7 @@ function bkRenderWeek() {
   $bk('bk-week-chip').textContent = 'Week ' + bkIsoWeek(bkWeekStart);
   $bk('bk-month-chip').textContent = BK_MONTHS[bkState.date.getMonth()];
   $bk('bk-week-prev').disabled = bkWeekStart <= bkMonday(bkToday());
+  $bk('bk-week-next').disabled = bkAddDays(bkWeekStart, 7) > bkLastBookable();
 
   const days = $bk('bk-days');
   days.innerHTML = '';
@@ -117,49 +196,45 @@ function bkRenderWeek() {
     if (bkSameDay(d, bkToday())) btn.classList.add('is-today');
     if (bkSameDay(d, bkState.date)) btn.classList.add('is-selected');
     btn.addEventListener('click', () => {
-      bkState.date = d;
+      bkSetDate(d);
       bkRenderSelect();
     });
     days.appendChild(btn);
   }
 }
 
-function bkRenderSlots() {
-  const wrap = $bk('bk-slots');
+function bkRenderSlotButtons(wrap, cls) {
   wrap.innerHTML = '';
-  BK_SLOT_HOURS.forEach(h => {
+  bkSlotsFor(bkState.date).forEach(s => {
     const btn = document.createElement('button');
-    btn.className = 'bk-slot';
-    btn.innerHTML = `<span class="t">${h}:00</span><span class="d">(1 Hour)</span>`;
-    if (!BK_AVAILABLE[h]) btn.disabled = true;
-    if (bkState.hours.includes(h)) btn.classList.add('is-selected');
-    btn.addEventListener('click', () => bkToggleHour(h, btn));
+    btn.className = cls;
+    btn.innerHTML = `<span class="t">${bkEsc(bkSlotStart(s.label))}</span>` +
+      `<span class="d">(${s.status === 'Available' ? bkHoursText(bkSlotHours(s.label)) : bkEsc(s.status)})</span>`;
+    btn.title = s.label;
+    if (s.status !== 'Available') btn.disabled = true;
+    if (bkState.slots.includes(s.id)) btn.classList.add('is-selected');
+    btn.addEventListener('click', () => bkToggleSlot(s.id, btn));
     wrap.appendChild(btn);
   });
-
-  const start = Math.min(...bkState.hours), end = Math.max(...bkState.hours) + 1;
-  $bk('bk-selected-time').textContent = `${start}:00 - ${end}:00`;
-  $bk('bk-selected-dur').textContent =
-    `${bkState.hours.length} Hour${bkState.hours.length > 1 ? 's' : ''} Section`;
 }
 
-// Adjacent click extends, endpoint click shrinks, anything else restarts
-function bkToggleHour(h, btn) {
-  const sel = bkState.hours.slice().sort((a, b) => a - b);
-  const min = sel[0], max = sel[sel.length - 1];
-  if (sel.includes(h)) {
-    if (sel.length > 1 && (h === min || h === max)) {
-      bkState.hours = sel.filter(x => x !== h);
-    } else {
-      bkState.hours = [h];
-    }
-  } else if (sel.length >= BK_MAX_HOURS) {
+function bkRenderSlots() {
+  bkRenderSlotButtons($bk('bk-slots'), 'bk-slot');
+  const sel = bkSelectedSlots();
+  const hours = sel.reduce((n, s) => n + bkSlotHours(s.label), 0);
+  $bk('bk-selected-time').textContent = sel.length ? sel.map(s => s.label).join(', ') : 'No session selected';
+  $bk('bk-selected-dur').textContent = `${bkHoursText(hours)} Section`;
+  $bk('bk-book-btn').disabled = !sel.length;
+}
+
+function bkToggleSlot(id, btn) {
+  if (bkState.slots.includes(id)) {
+    bkState.slots = bkState.slots.filter(x => x !== id);
+  } else if (bkState.slots.length >= BK_MAX_SLOTS) {
     bkFlashMaxHours(btn);
     return;
-  } else if (h === max + 1 || h === min - 1) {
-    bkState.hours = sel.concat(h);
   } else {
-    bkState.hours = [h];
+    bkState.slots = bkState.slots.concat(id);
   }
   if (isMobileDevice()) { bkpRenderSlots(); bkpRenderTicket(); }
   else { bkRenderSlots(); bkRenderTicket(); }
@@ -184,7 +259,7 @@ function bkRenderTicket() {
   $bk('bk-ticket-name').textContent = data.name;
   $bk('bk-ticket-when').textContent = bkWhenLabel(d);
   $bk('bk-ticket-date').textContent = `${BK_MONTHS[d.getMonth()]} ${d.getDate()}`;
-  $bk('bk-ticket-section').textContent = bkSectionText(bkState.hours);
+  $bk('bk-ticket-section').textContent = bkSectionText(bkSelectedSlots());
 }
 
 /* ============================================================
@@ -207,6 +282,8 @@ function bkRenderCalendar() {
   $bk('bk-cal-month').textContent = BK_MONTHS[bkCalMonth.getMonth()];
   const thisMonth = new Date(bkToday().getFullYear(), bkToday().getMonth(), 1);
   $bk('bk-cal-prev').disabled = bkCalMonth <= thisMonth;
+  const last = bkLastBookable();
+  $bk('bk-cal-next').disabled = bkCalMonth >= new Date(last.getFullYear(), last.getMonth(), 1);
 
   const grid = $bk('bk-cal-grid');
   grid.innerHTML = '';
@@ -233,7 +310,7 @@ function bkRenderCalendar() {
 }
 
 function bkConfirmCalendar() {
-  bkState.date = bkCalPick;
+  if (!bkSameDay(bkCalPick, bkState.date)) bkSetDate(bkCalPick);
   bkWeekStart = bkMonday(bkCalPick);
   bkRenderSelect();
   bkCloseCalendar();
@@ -246,13 +323,14 @@ function bkConfirmCalendar() {
 let bkSafetyChecked = false;
 
 function bkOpenConfirm() {
+  if (!bkSelectedSlots().length) return;
   bkSafetyChecked = false;
   $bk('bk-safety').classList.remove('is-checked');
   $bk('bk-confirm-btn').classList.remove('is-enabled');
   const d = bkState.date;
   $bk('bk-confirm-name').textContent = bkMachineData[bkState.machine].name;
   $bk('bk-confirm-when').textContent = bkWhenLabel(d);
-  $bk('bk-confirm-section').textContent = bkSectionText(bkState.hours);
+  $bk('bk-confirm-section').textContent = bkSectionText(bkSelectedSlots());
   $bk('bk-confirm-date').textContent =
     `${BK_MONTHS[d.getMonth()]} ${d.getDate()} (Week ${bkIsoWeek(d)})`;
   $bk('bk-confirm-overlay').classList.add('is-open');
@@ -268,21 +346,47 @@ function bkToggleSafety() {
   $bk('bk-confirm-btn').classList.toggle('is-enabled', bkSafetyChecked);
 }
 
-function bkCommitBooking() {
-  const booking = {
-    machine: bkState.machine,
-    date: new Date(bkState.date),
-    hours: bkState.hours.slice(),
-  };
-  bkState.bookings.push(booking);
-  bkState.lastBooked = booking;
-  saveBookings(bkState.bookings);
-  return booking;
+// Re-reads the user's bookings from the server
+async function bkRefreshBookings() {
+  const today = bkYmd(bkToday());
+  const rows = await listBookings();
+  bkState.bookings = rows
+    .filter(r => (r.status === 0 || r.status === 1) && r.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date) || Number(a.slotId) - Number(b.slotId))
+    .map(r => ({
+      id: r.id,
+      machine: bkMachineKeyFor(r.printerType),
+      printerType: r.printerType,
+      date: bkParseYmd(r.date),
+      slotId: r.slotId,
+      label: r.label,
+      canCancel: r.canCancel,
+    }));
+  const lastId = bkState.lastBooked && bkState.lastBooked.id;
+  bkState.lastBooked = bkState.bookings.find(b => b.id === lastId) || null;
 }
 
-function bkConfirmBooking() {
-  if (!bkSafetyChecked) return;
-  bkCommitBooking();
+// Books the selected sessions; lastBooked becomes the first of them
+async function bkSubmitSelection() {
+  const slots = bkSelectedSlots();
+  const date = bkYmd(bkState.date);
+  await createBookings(slots.map(s => ({ date, slotId: s.id, printerType: bkAvail.printerType })));
+  await bkRefreshBookings();
+  bkState.lastBooked = bkState.bookings.find(b =>
+    bkYmd(b.date) === date && b.slotId === slots[0].id && b.printerType === bkAvail.printerType) || null;
+}
+
+async function bkConfirmBooking() {
+  if (!bkSafetyChecked || bkBusy) return;
+  bkBusy = true;
+  try {
+    await bkSubmitSelection();
+  } catch (err) {
+    alert(err.message);
+    return;
+  } finally {
+    bkBusy = false;
+  }
   bkCloseConfirm();
   $bk('bk-select').classList.remove('is-open');
   bkOpenInfo('a');
@@ -296,14 +400,11 @@ function bkOpenInfo(page, booking) {
   const b = booking || bkState.lastBooked;
   if (!b) return;
   const d = b.date;
-  const start = Math.min(...b.hours), end = Math.max(...b.hours) + 1;
-  $bk('bk-info-machine').textContent = bkMachineData[b.machine].name;
+  $bk('bk-info-machine').textContent = bkMachineInfo(b).name;
   $bk('bk-visit-rel').textContent = bkRelLabel(d);
-  $bk('bk-visit-date').textContent =
-    `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}`;
-  $bk('bk-session-total').textContent =
-    `Total ${b.hours.length} Hour${b.hours.length > 1 ? 's' : ''}`;
-  $bk('bk-session-time').textContent = `${start}:00 - ${end}:00`;
+  $bk('bk-visit-date').textContent = bkDayText(d);
+  $bk('bk-session-total').textContent = `Total ${bkHoursText(bkSlotHours(b.label))}`;
+  $bk('bk-session-time').textContent = b.label;
 
   bkShowInfoPage(page || 'a');
   $bk('bk-info').classList.add('is-open');
@@ -357,7 +458,7 @@ function bkTicketSlideHTML(b, i) {
         <div class="hero-ticket__circle hero-ticket__circle--br"></div>
         <div class="hero-ticket__head">Booked Section</div>
         <img class="hero-ticket__printer" src="assets/booking/printer_cutout.png" alt="">
-        <p class="hero-ticket__name">${bkMachineData[b.machine].name}</p>
+        <p class="hero-ticket__name">${bkEsc(bkMachineInfo(b).name)}</p>
         <div class="hero-ticket__meta">
           <div>
             <p class="l">Date</p>
@@ -365,7 +466,7 @@ function bkTicketSlideHTML(b, i) {
           </div>
           <div>
             <p class="l">Section</p>
-            <p class="v">${bkSectionText(b.hours)}</p>
+            <p class="v">${bkEsc(bkSectionText([b]))}</p>
           </div>
         </div>
         <div class="${whenClass}">
@@ -404,7 +505,8 @@ function bkHeroGoTo(i) {
 
 function bkApplyHeroTicket() {
   if (!bkState.bookings.length) return;
-  bkState.heroIndex = bkState.bookings.length - 1;
+  const i = bkState.bookings.indexOf(bkState.lastBooked);
+  bkState.heroIndex = i >= 0 ? i : bkState.bookings.length - 1;
   bkRenderHeroTicket();
   document.querySelector('.hero').classList.add('has-ticket');
 }
@@ -416,8 +518,7 @@ function bkApplyHeroTicket() {
 let tkIndex = -1; // -1 = empty state
 
 function tkTabLabel(b) {
-  const start = Math.min(...b.hours);
-  return `${BK_MONTHS[b.date.getMonth()].slice(0, 3)} ${b.date.getDate()} Time: ${start}:00`;
+  return `${BK_MONTHS[b.date.getMonth()].slice(0, 3)} ${b.date.getDate()} Time: ${bkEsc(bkSlotStart(b.label))}`;
 }
 
 function tkRenderTabs() {
@@ -452,18 +553,16 @@ function tkRenderDetail() {
   $bk('tkpop-card').hidden = !b;
   $bk('tkpop-empty').hidden = !!b;
   if (!b) return;
-  const data = bkMachineData[b.machine];
+  const data = bkMachineInfo(b);
   const d = b.date;
-  const start = Math.min(...b.hours), end = Math.max(...b.hours) + 1;
   $bk('tkpop-photo').src = data.photo;
   $bk('tkpop-machine').textContent = data.name;
   $bk('tkpop-venue-code').textContent = data.venue;
   $bk('tkpop-visit-rel').textContent = bkRelLabel(d);
-  $bk('tkpop-visit-date').textContent =
-    `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}`;
-  $bk('tkpop-session-total').textContent =
-    `Total ${b.hours.length} Hour${b.hours.length > 1 ? 's' : ''}`;
-  $bk('tkpop-session-time').textContent = `${start}:00 - ${end}:00`;
+  $bk('tkpop-visit-date').textContent = bkDayText(d);
+  $bk('tkpop-session-total').textContent = `Total ${bkHoursText(bkSlotHours(b.label))}`;
+  $bk('tkpop-session-time').textContent = b.label;
+  $bk('tkpop-cancel-btn').disabled = !b.canCancel;
 }
 
 function openTicketPopup(i) {
@@ -501,13 +600,10 @@ function tkPositionCancelPanel() {
 
 function tkOpenCancel() {
   const b = bkState.bookings[tkIndex];
-  if (!b) return;
-  const d = b.date;
-  const start = Math.min(...b.hours), end = Math.max(...b.hours) + 1;
-  $bk('tkpop-cancel-machine').textContent = bkMachineData[b.machine].name;
-  $bk('tkpop-cancel-date').textContent =
-    `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}`;
-  $bk('tkpop-cancel-time').textContent = `${start}:00 - ${end}:00`;
+  if (!b || !b.canCancel) return;
+  $bk('tkpop-cancel-machine').textContent = bkMachineInfo(b).name;
+  $bk('tkpop-cancel-date').textContent = bkDayText(b.date);
+  $bk('tkpop-cancel-time').textContent = b.label;
   $bk('tkpop-cancel-btn').classList.add('is-under-confirm');
   tkPositionCancelPanel();
   $bk('tkpop-cancel-overlay').classList.add('is-open');
@@ -518,11 +614,18 @@ function tkCloseCancel() {
   $bk('tkpop-cancel-btn').classList.remove('is-under-confirm');
 }
 
-function tkConfirmCancel() {
-  const removed = bkState.bookings.splice(tkIndex, 1)[0];
-  saveBookings(bkState.bookings);
-  if (bkState.lastBooked === removed) {
-    bkState.lastBooked = bkState.bookings[bkState.bookings.length - 1] || null;
+async function tkConfirmCancel() {
+  const b = bkState.bookings[tkIndex];
+  if (!b || bkBusy) return;
+  bkBusy = true;
+  try {
+    await cancelBooking(b.id);
+    await bkRefreshBookings();
+  } catch (err) {
+    alert(err.message);
+    return;
+  } finally {
+    bkBusy = false;
   }
   tkIndex = -1;
   tkCloseCancel();
@@ -535,15 +638,16 @@ function tkConfirmCancel() {
   document.querySelector('.hero').classList.toggle('has-ticket', bkState.bookings.length > 0);
 }
 
-function bkRestoreBookings() {
-  bkState.bookings = loadBookings();
+// Called by main.js once the user is logged in
+async function bkLoadBookings() {
+  await bkRefreshBookings();
   bkState.lastBooked = bkState.bookings[bkState.bookings.length - 1] || null;
   if (!isMobileDevice()) bkApplyHeroTicket();
 }
 
 function bkOnLogout() {
   bkState.bookings = [];
-  saveBookings([]);
+  bkAvail = null;
   bkState.lastBooked = null;
   bkState.heroIndex = 0;
   $bk('hero-ticket-track').innerHTML = '';
@@ -607,6 +711,8 @@ function bkpRenderCalendar() {
   $bk('bkp-cal-monthname').textContent = BK_MONTHS[bkpCalMonth.getMonth()];
   const thisMonth = new Date(bkToday().getFullYear(), bkToday().getMonth(), 1);
   $bk('bkp-cal-prev').disabled = bkpCalMonth <= thisMonth;
+  const last = bkLastBookable();
+  $bk('bkp-cal-next').disabled = bkpCalMonth >= new Date(last.getFullYear(), last.getMonth(), 1);
 
   const grid = $bk('bkp-cal-grid');
   grid.innerHTML = '';
@@ -630,25 +736,16 @@ function bkpRenderCalendar() {
 }
 
 function bkpSelectDate(d) {
-  bkState.date = d;
-  bkState.hours = [BK_SLOT_HOURS.find(h => BK_AVAILABLE[h])];
+  bkSetDate(d);
   bkpRenderSelect();
 }
 
 function bkpRenderSlots() {
-  const wrap = $bk('bkp-slots');
-  wrap.innerHTML = '';
-  BK_SLOT_HOURS.forEach(h => {
-    const btn = document.createElement('button');
-    btn.className = 'bkp-slot';
-    btn.innerHTML = `<span class="t">${h}:00</span><span class="d">(1 Hour)</span>`;
-    if (!BK_AVAILABLE[h]) btn.disabled = true;
-    if (bkState.hours.includes(h)) btn.classList.add('is-selected');
-    btn.addEventListener('click', () => bkToggleHour(h, btn));
-    wrap.appendChild(btn);
-  });
+  bkRenderSlotButtons($bk('bkp-slots'), 'bkp-slot');
+  const sel = bkSelectedSlots();
   $bk('bkp-chosen-time').textContent =
-    'Chosen time: ' + bkState.hours.map(h => `${h}:00`).join(', ');
+    'Chosen time: ' + (sel.length ? sel.map(s => s.label).join(', ') : 'none');
+  $bk('bkp-book-btn').disabled = !bkSafetyChecked || !sel.length;
 }
 
 function bkpRenderTicket() {
@@ -657,18 +754,28 @@ function bkpRenderTicket() {
   $bk('bkp-ticket-name').textContent = data.name;
   $bk('bkp-ticket-when-label').textContent = bkWhenLabel(d);
   $bk('bkp-ticket-date').textContent = `${BK_MONTHS[d.getMonth()]} ${d.getDate()} (Week ${bkIsoWeek(d)})`;
-  $bk('bkp-ticket-section').textContent = bkSectionText(bkState.hours);
+  $bk('bkp-ticket-section').textContent = bkSectionText(bkSelectedSlots());
 }
 
 function bkpToggleSafety() {
   bkSafetyChecked = !bkSafetyChecked;
   $bk('bkp-safety').classList.toggle('is-checked', bkSafetyChecked);
-  $bk('bkp-book-btn').disabled = !bkSafetyChecked;
+  $bk('bkp-book-btn').disabled = !bkSafetyChecked || !bkSelectedSlots().length;
 }
 
-function bkpSubmitBooking() {
-  if (!bkSafetyChecked) return;
-  bkCommitBooking();
+async function bkpSubmitBooking() {
+  if (!bkSafetyChecked || !bkSelectedSlots().length || bkBusy) return;
+  bkBusy = true;
+  $bk('bkp-book-btn').disabled = true;
+  try {
+    await bkSubmitSelection();
+  } catch (err) {
+    alert(err.message);
+    $bk('bkp-book-btn').disabled = false;
+    return;
+  } finally {
+    bkBusy = false;
+  }
   bkpCloseSelect(false);
   bkpOpenInfo();
 }
@@ -678,14 +785,12 @@ let bkpInfoPage = 1;
 function bkpOpenInfo() {
   const b = bkState.lastBooked;
   if (!b) return;
-  const data = bkMachineData[b.machine];
-  const d = b.date;
-  const start = Math.min(...b.hours), end = Math.max(...b.hours) + 1;
+  const data = bkMachineInfo(b);
   $bk('bkp-info-photo').src = data.photo;
   $bk('bkp-info-machine').textContent = data.name;
-  $bk('bkp-info-session').textContent = `${start}:00 - ${end}:00`;
-  $bk('bkp-info-rel').textContent = bkRelLabel(d);
-  $bk('bkp-info-date').textContent = `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}`;
+  $bk('bkp-info-session').textContent = b.label;
+  $bk('bkp-info-rel').textContent = bkRelLabel(b.date);
+  $bk('bkp-info-date').textContent = bkDayText(b.date);
 
   bkpShowInfoPage(1);
   $bk('bkp-info').classList.add('is-open');
@@ -753,16 +858,16 @@ function bkpRenderManage() {
   $bk('bkp-manage-prev').hidden = bkpMgrIndex <= 0;
   $bk('bkp-manage-next').hidden = bkpMgrIndex >= n - 1;
 
-  const data = bkMachineData[b.machine];
+  const data = bkMachineInfo(b);
   const d = b.date;
-  const start = Math.min(...b.hours), end = Math.max(...b.hours) + 1;
   $bk('bkp-manage-title').textContent =
-    `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} Time: ${start}:00`;
+    `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} Time: ${bkSlotStart(b.label)}`;
   $bk('bkp-manage-photo').src = data.photo;
   $bk('bkp-manage-machine').textContent = data.name;
-  $bk('bkp-manage-session').textContent = `${start}:00 - ${end}:00`;
+  $bk('bkp-manage-session').textContent = b.label;
   $bk('bkp-manage-rel').textContent = bkRelLabel(d);
-  $bk('bkp-manage-date').textContent = `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}`;
+  $bk('bkp-manage-date').textContent = bkDayText(d);
+  $bk('bkp-manage-cancel-btn').disabled = !b.canCancel;
 }
 
 function bkpMgrPrev() {
@@ -780,13 +885,9 @@ function bkpMgrNext() {
 
 function bkpOpenCancelPanel() {
   const b = bkState.bookings[bkpMgrIndex];
-  if (!b) return;
-  const data = bkMachineData[b.machine];
-  const d = b.date;
-  const start = Math.min(...b.hours), end = Math.max(...b.hours) + 1;
-  $bk('bkp-manage-cancel-machine').textContent = data.name;
-  $bk('bkp-manage-cancel-time').textContent =
-    `${BK_MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()} ${BK_DOW_FULL[d.getDay()]}, ${start}:00 - ${end}:00`;
+  if (!b || !b.canCancel) return;
+  $bk('bkp-manage-cancel-machine').textContent = bkMachineInfo(b).name;
+  $bk('bkp-manage-cancel-time').textContent = `${bkDayText(b.date)}, ${b.label}`;
   $bk('bkp-manage-cancel-overlay').classList.add('is-open');
 }
 
@@ -794,11 +895,18 @@ function bkpCloseCancelPanel() {
   $bk('bkp-manage-cancel-overlay').classList.remove('is-open');
 }
 
-function bkpConfirmCancel() {
-  const removed = bkState.bookings.splice(bkpMgrIndex, 1)[0];
-  saveBookings(bkState.bookings);
-  if (bkState.lastBooked === removed) {
-    bkState.lastBooked = bkState.bookings[bkState.bookings.length - 1] || null;
+async function bkpConfirmCancel() {
+  const b = bkState.bookings[bkpMgrIndex];
+  if (!b || bkBusy) return;
+  bkBusy = true;
+  try {
+    await cancelBooking(b.id);
+    await bkRefreshBookings();
+  } catch (err) {
+    alert(err.message);
+    return;
+  } finally {
+    bkBusy = false;
   }
   bkpMgrIndex = Math.max(0, Math.min(bkpMgrIndex, bkState.bookings.length - 1));
   bkpCloseCancelPanel();
@@ -858,12 +966,13 @@ $bk('bk-back').addEventListener('click', () => bkCloseSelect(true));
 $bk('bk-week-prev').addEventListener('click', () => {
   bkWeekStart = bkAddDays(bkWeekStart, -7);
   const first = bkFirstBookable(new Date(Math.max(bkWeekStart, bkToday())));
-  if (!bkSameDay(bkMonday(bkState.date), bkWeekStart)) bkState.date = first;
+  if (first && bkSameDay(bkMonday(first), bkWeekStart)) bkSetDate(first);
   bkRenderSelect();
 });
 $bk('bk-week-next').addEventListener('click', () => {
   bkWeekStart = bkAddDays(bkWeekStart, 7);
-  if (!bkSameDay(bkMonday(bkState.date), bkWeekStart)) bkState.date = bkFirstBookable(bkWeekStart);
+  const first = bkFirstBookable(bkWeekStart);
+  if (first && bkSameDay(bkMonday(first), bkWeekStart)) bkSetDate(first);
   bkRenderSelect();
 });
 $bk('bk-viewmonth').addEventListener('click', bkOpenCalendar);
@@ -935,4 +1044,4 @@ document.addEventListener('keydown', e => {
   else if ($bk('ticket-popup').classList.contains('is-open')) closeTicketPopup();
 });
 
-export { bkState, bkOnLogout, bkRestoreBookings, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow };
+export { bkState, bkOnLogout, bkLoadBookings, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow };

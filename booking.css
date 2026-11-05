@@ -374,6 +374,7 @@
   z-index: 1;
 }
 .bk-cta-btn:hover { background: #006cd6; }
+.bk-cta-btn:disabled { background: #9cbfe3; cursor: default; }
 
 /* Info wizard variant (smaller text, wider) */
 .bk-cta--info { left: calc(744 * var(--bk)); top: calc(842 * var(--bk)); width: calc(895 * var(--bk)); height: calc(131 * var(--bk)); }
@@ -1445,6 +1446,7 @@
   transition: background 0.2s, transform 0.2s;
 }
 .tkpop-cancel-btn:hover { background: #d9453a; transform: scale(1.03); }
+.tkpop-cancel-btn:disabled { background: #c9cdd1; transform: none; cursor: default; }
 
 .tkpop-info-card {
   position: relative;
@@ -2088,6 +2090,7 @@ html.is-desktop .bkp-view { display: none !important; }
   cursor: pointer;
 }
 .bkp-manage-cancel:active { background: #d9453a; }
+.bkp-manage-cancel:disabled { background: #c9cdd1; cursor: default; }
 
 .bkp-manage-empty { display: none; align-items: center; justify-content: center; min-height: 200px; padding: 40px 24px; }
 .bkp-manage-empty p { margin: 0; font-size: 21px; font-weight: 500; color: #4d7187; }
