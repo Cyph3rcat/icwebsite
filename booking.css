@@ -1,8 +1,6 @@
 /* ============================================================
-   BOOKING FLOW (Bambu X1) — see CLAUDE.md "Booking flow" section
-   Unit convention: 1 Figma design px = var(--bk).
-   Design canvas: 1728 wide; view canvases are 1728 x 1000
-   (Figma frame minus the 95px browser-chrome topbar).
+   BOOKING FLOW
+   --bk = 1px of the 1728px-wide Figma frame
 ============================================================ */
 
 .bk-view {
@@ -43,7 +41,7 @@
   z-index: 3;
   transition: background .2s;
 }
-.bk-back:hover { background: #0069d4; }
+.bk-back:hover { background: #006cd6; }
 .bk-back img { height: calc(31 * var(--bk)); }
 
 .bk-photo {
@@ -53,7 +51,7 @@
   width: calc(840 * var(--bk));
   height: calc(634 * var(--bk));
   object-fit: cover;
-  border-radius: 0 calc(37 * var(--bk)) calc(37 * var(--bk)) 0;
+  border-radius: calc(37 * var(--bk));
 }
 
 .bk-title {
@@ -91,7 +89,7 @@
   color: #4d7187;
 }
 .bk-viewmonth {
-  background: #6fa9e4;
+  background: #6bb3ff;
   color: #fff;
   border: none;
   border-radius: calc(50 * var(--bk));
@@ -102,7 +100,7 @@
   cursor: pointer;
   transition: background .2s;
 }
-.bk-viewmonth:hover { background: #589ce0; }
+.bk-viewmonth:hover { background: #4fa0f7; }
 
 /* Day-of-week strip */
 .bk-daybar {
@@ -138,9 +136,10 @@
 .bk-day-arrow:disabled { opacity: .3; cursor: default; }
 .bk-days { display: flex; gap: calc(16 * var(--bk)); align-items: center; }
 .bk-day {
+  position: relative;
   width: calc(80 * var(--bk));
   height: calc(95 * var(--bk));
-  background: #dee9f5;
+  background: #e3e3e3;
   border: none;
   border-radius: calc(12 * var(--bk));
   font-family: inherit;
@@ -156,24 +155,35 @@
 }
 .bk-day .dow { font-size: calc(17 * var(--bk)); }
 .bk-day .num { font-size: calc(21 * var(--bk)); }
-.bk-day.is-today { color: #6fa9e4; }
+.bk-day.is-today { color: #3899ff; }
+.bk-day.is-today::before {
+  content: '';
+  position: absolute;
+  top: calc(8 * var(--bk));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(11 * var(--bk));
+  height: calc(10 * var(--bk));
+  background: url('assets/Icon/Arrow/Calendar_today_notch.svg') no-repeat center / contain;
+}
 .bk-day:not(:disabled):hover {
-  background: #6fa9e4;
-  color: #fff;
+  background: #3899ff;
+  color: #f2f5f8;
   transform: scale(1.08);
 }
 .bk-day:not(:disabled):active {
-  background: #4d84b8;
-  color: #fff;
+  background: #1676d3;
+  color: #f2f5f8;
   transform: scale(0.97);
 }
 .bk-day.is-selected {
-  background: #6fa9e4;
-  color: #fff;
+  background: #3899ff;
+  color: #f2f5f8;
   height: calc(130 * var(--bk));
   border-radius: calc(10 * var(--bk));
   font-weight: 700;
 }
+.bk-day.is-selected.is-today::before { background-image: url('assets/Icon/Arrow/Calendar_today_notch.svg'); filter: brightness(0) invert(1); }
 .bk-day:disabled {
   background: #fbfbfb;
   color: #cfcfcf;
@@ -233,10 +243,10 @@
 .bk-slot:last-child { border-bottom-right-radius: calc(50 * var(--bk)); }
 .bk-slot .t { font-size: calc(24.6 * var(--bk)); }
 .bk-slot .d { font-size: calc(12.5 * var(--bk)); }
-.bk-slot:not(:disabled):hover { background: #6fa9e4; color: #fff; transform: scale(1.05); }
+.bk-slot:not(:disabled):hover { background: #dbe5eb; color: #4d7187; transform: scale(1.05); }
 .bk-slot:not(:disabled):active { transform: scale(0.97); }
 .bk-slot.is-selected { background: #6fa9e4; color: #fff; }
-.bk-slot.is-selected:hover { background: #6fa9e4; }
+.bk-slot.is-selected:hover { background: #6fa9e4; color: #fff; }
 .bk-slot:disabled { background: #fbfbfb; color: #cfcfcf; cursor: default; }
 
 /* Small ticket (bottom-left preview) */
@@ -254,7 +264,7 @@
   position: absolute;
   inset: 0 0 auto 0;
   height: calc(61 * var(--bk));
-  background: #6fa9e4;
+  background: #3899ff;
   color: #fff;
   font-size: calc(33 * var(--bk));
   font-weight: 500;
@@ -278,7 +288,7 @@
   margin: 0;
   font-size: calc(43.5 * var(--bk));
   font-weight: 500;
-  color: #6fa9e4;
+  color: #3899ff;
   white-space: nowrap;
 }
 .bk-ticket-when {
@@ -286,7 +296,7 @@
   left: 0;
   top: calc(140 * var(--bk));
   height: calc(38 * var(--bk));
-  background: #589ce0;
+  background: #1676d3;
   border-radius: 0 calc(50 * var(--bk)) calc(50 * var(--bk)) 0;
   display: flex;
   align-items: center;
@@ -305,7 +315,7 @@
   top: calc(208 * var(--bk));
   display: flex;
   gap: calc(56 * var(--bk));
-  color: #035ab0;
+  color: #0055a8;
 }
 .bk-ticket-meta p { margin: 0; font-size: calc(20 * var(--bk)); white-space: nowrap; }
 .bk-ticket-meta .l { font-weight: 500; }
@@ -326,7 +336,7 @@
   line-height: calc(33 * var(--bk));
 }
 
-/* Big CTA button with mascot (shared: Book Section / Continue) */
+/* Big CTA button with mascot */
 .bk-cta {
   position: absolute;
   left: calc(862 * var(--bk));
@@ -340,19 +350,19 @@
   top: calc(-15 * var(--bk));
   width: calc(91 * var(--bk));
   height: calc(131 * var(--bk));
-  color: #007fff;
+  color: #0a86ff;
   pointer-events: none;
   z-index: 0;
   transition: color .2s;
 }
-.bk-cta:has(.bk-cta-btn:hover) .bk-cta-mascot { color: #0069d4; }
+.bk-cta:has(.bk-cta-btn:hover) .bk-cta-mascot { color: #006cd6; }
 .bk-cta-btn {
   position: absolute;
   left: 0;
   top: calc(50 * var(--bk));
   width: calc(800 * var(--bk));
   height: calc(85 * var(--bk));
-  background: #007fff;
+  background: #0a86ff;
   color: #fff;
   border: none;
   border-radius: calc(50 * var(--bk));
@@ -363,7 +373,7 @@
   transition: background .2s;
   z-index: 1;
 }
-.bk-cta-btn:hover { background: #0069d4; }
+.bk-cta-btn:hover { background: #006cd6; }
 
 /* Info wizard variant (smaller text, wider) */
 .bk-cta--info { left: calc(744 * var(--bk)); top: calc(842 * var(--bk)); width: calc(895 * var(--bk)); height: calc(131 * var(--bk)); }
@@ -457,7 +467,7 @@
   font-size: calc(20 * var(--bk));
   color: #4d7187;
 }
-.bk-cal-weekdays .we { color: #6fa9e4; }
+.bk-cal-weekdays .we { color: #3899ff; }
 
 .bk-cal-divider {
   position: absolute;
@@ -492,10 +502,10 @@
   transition: background .15s;
 }
 .bk-cal-day:not(:disabled):hover { background: #dee9f5; }
-.bk-cal-day.is-we { background: #fbfbfb; color: #6fa9e4; opacity: .7; }
+.bk-cal-day.is-we { background: #fbfbfb; color: #3899ff; opacity: .7; }
 .bk-cal-day:disabled { background: #fbfbfb; color: #cfcfcf; opacity: .7; cursor: default; }
-.bk-cal-day.is-selected { background: #6fa9e4; color: #fff; font-weight: 600; opacity: 1; }
-.bk-cal-day.is-selected:hover { background: #6fa9e4; }
+.bk-cal-day.is-selected { background: #3899ff; color: #fff; font-weight: 600; opacity: 1; }
+.bk-cal-day.is-selected:hover { background: #3899ff; }
 
 .bk-cal-confirm {
   position: absolute;
@@ -504,7 +514,7 @@
   transform: translateX(-50%);
   width: calc(589 * var(--bk));
   height: calc(67 * var(--bk));
-  background: #6fa9e4;
+  background: #3899ff;
   color: #fff;
   border: none;
   border-radius: calc(50 * var(--bk));
@@ -514,7 +524,7 @@
   cursor: pointer;
   transition: background .2s;
 }
-.bk-cal-confirm:hover { background: #589ce0; }
+.bk-cal-confirm:hover { background: #1676d3; }
 
 /* ---------- Confirm Booking ticket ---------- */
 
@@ -526,10 +536,11 @@
   overflow: hidden;
   background: url('assets/booking/ticket_shape_confirm.svg') no-repeat 0 0;
   background-size: calc(1401 * var(--bk)) calc(603 * var(--bk));
-  transform: translateX(-120vw);
-  transition: transform .55s cubic-bezier(.2, .8, .25, 1);
+  transform: translateY(40px) scale(0.95);
+  opacity: 0;
+  transition: transform .4s cubic-bezier(.2, .8, .25, 1), opacity .3s ease;
 }
-.bk-confirm-overlay.is-open .bk-confirm { transform: translateX(0); }
+.bk-confirm-overlay.is-open .bk-confirm { transform: translateY(0) scale(1); opacity: 1; }
 
 .bk-confirm-circle {
   position: absolute;
@@ -544,7 +555,7 @@
   position: absolute;
   inset: 0 0 auto 0;
   height: calc(100 * var(--bk));
-  background: #3487d9;
+  background: #006cd6;
   border-top-left-radius: calc(32 * var(--bk));
   color: #e1ecfd;
   font-size: calc(58.6 * var(--bk));
@@ -569,7 +580,7 @@
   margin: 0;
   font-size: calc(58.6 * var(--bk));
   font-weight: 600;
-  color: #007ffe;
+  color: #0a86ff;
   white-space: nowrap;
 }
 .bk-confirm-when {
@@ -578,7 +589,7 @@
   top: calc(217 * var(--bk));
   width: calc(885 * var(--bk));
   height: calc(50 * var(--bk));
-  background: #5597d9;
+  background: #006cd6;
   border-radius: calc(50 * var(--bk));
   display: flex;
   align-items: center;
@@ -597,7 +608,7 @@
   top: calc(291 * var(--bk));
   display: flex;
   gap: calc(185 * var(--bk));
-  color: #035ab0;
+  color: #0055a8;
 }
 .bk-confirm-meta p { margin: 0; white-space: nowrap; }
 .bk-confirm-meta .l { font-size: calc(29.5 * var(--bk)); font-weight: 500; }
@@ -616,14 +627,14 @@
 .bk-safety-box {
   width: calc(20 * var(--bk));
   height: calc(20 * var(--bk));
-  border: calc(2 * var(--bk)) solid #007fff;
+  border: calc(2 * var(--bk)) solid #0a86ff;
   border-radius: 50%;
   background: transparent;
   flex: 0 0 auto;
   transition: background .15s;
   position: relative;
 }
-.bk-safety.is-checked .bk-safety-box { background: #007fff; }
+.bk-safety.is-checked .bk-safety-box { background: #0a86ff; }
 .bk-safety.is-checked .bk-safety-box::after {
   content: '';
   position: absolute;
@@ -635,8 +646,8 @@
   border-width: 0 calc(2.5 * var(--bk)) calc(2.5 * var(--bk)) 0;
   transform: rotate(45deg);
 }
-.bk-safety-text { font-size: calc(14.5 * var(--bk)); font-weight: 300; color: #035ab0; white-space: nowrap; }
-.bk-safety-text a { color: #007fff; font-weight: 500; font-style: italic; }
+.bk-safety-text { font-size: calc(14.5 * var(--bk)); font-weight: 300; color: #0055a8; white-space: nowrap; }
+.bk-safety-text a { color: #0a86ff; font-weight: 500; font-style: italic; }
 
 .bk-confirm-actions {
   position: absolute;
@@ -661,12 +672,12 @@
   color: #fff;
   cursor: default;
 }
-.bk-confirm-btn.is-enabled { background: #007fff; cursor: pointer; }
-.bk-confirm-btn.is-enabled:hover { background: #0069d4; }
+.bk-confirm-btn.is-enabled { background: #0a86ff; cursor: pointer; }
+.bk-confirm-btn.is-enabled:hover { background: #006cd6; }
 .bk-cancel-btn { width: calc(298 * var(--bk)); background: #fff; color: #0d3a67; }
 .bk-cancel-btn:hover { background: #e1ecfd; }
 
-/* ---------- Info wizard (Booked successfully / steps / prepare) ---------- */
+/* ---------- Info wizard ---------- */
 
 .bk-page { position: absolute; inset: 0; display: none; }
 .bk-page.is-active { display: block; }
@@ -701,9 +712,9 @@
   font-family: inherit;
   font-size: calc(23.8 * var(--bk));
   color: #4d7187;
-  text-decoration: underline;
   cursor: pointer;
 }
+.bk-skip:hover { color: #273944; }
 .bk-skip img { height: calc(18 * var(--bk)); }
 
 /* Page A cards */
@@ -774,15 +785,18 @@
   flex-direction: column;
   gap: calc(28 * var(--bk));
 }
-.bk-steps-row { display: flex; gap: calc(25 * var(--bk)); }
+.bk-steps-row { display: flex; align-items: stretch; gap: calc(25 * var(--bk)); }
 .bk-step {
   position: relative;
   overflow: hidden;
   border-radius: calc(20 * var(--bk));
-  height: calc(236 * var(--bk));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: calc(236 * var(--bk));
   flex: 1 1 0;
 }
-.bk-step--wide { flex: 1 1 0; height: calc(237 * var(--bk)); }
+.bk-step--wide { flex: 1 1 0; min-height: calc(237 * var(--bk)); }
 .bk-step--round-tr { border-top-right-radius: calc(150 * var(--bk)); }
 .bk-step--round-br { border-bottom-right-radius: calc(150 * var(--bk)); }
 .bk-step > img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -791,20 +805,39 @@
   inset: 0;
   background: linear-gradient(to right, rgba(58, 60, 72, .88), rgba(76, 78, 91, 0) 75%);
 }
-.bk-step p { margin: 0; position: absolute; left: calc(24 * var(--bk)); color: #fff; }
-.bk-step .step-n { top: calc(18 * var(--bk)); font-size: calc(17.4 * var(--bk)); }
-.bk-step .step-h { top: calc(47 * var(--bk)); font-size: calc(22 * var(--bk)); font-weight: 600; }
-.bk-step .step-d { top: calc(158 * var(--bk)); font-size: calc(17.4 * var(--bk)); width: calc(370 * var(--bk)); line-height: 1.4; }
-.bk-step .step-d b { font-weight: 600; }
+/* Step header, floating over the photo */
+.bk-step .step-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(10 * var(--bk));
+  padding: calc(18 * var(--bk)) calc(24 * var(--bk)) 0;
+}
+.bk-step .step-head p { margin: 0; color: #fff; }
+.bk-step .step-n { font-size: calc(17.4 * var(--bk)); }
+.bk-step .step-h { margin-top: calc(6 * var(--bk)) !important; font-size: calc(22 * var(--bk)); font-weight: 600; }
 .bk-step .arr {
-  position: absolute;
-  right: calc(34 * var(--bk));
-  top: calc(23 * var(--bk));
+  flex: none;
   width: calc(39 * var(--bk));
   height: calc(41 * var(--bk));
 }
-.bk-step .arr--down { top: auto; bottom: calc(20 * var(--bk)); transform: rotate(90deg); }
+.bk-step .arr--down { transform: rotate(90deg); }
 .bk-step .arr--left { transform: rotate(180deg); }
+.bk-step .step-bar {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.9);
+  padding: calc(14 * var(--bk)) calc(24 * var(--bk));
+}
+.bk-step .step-d {
+  margin: 0;
+  font-size: calc(17.4 * var(--bk));
+  line-height: 1.4;
+  color: #4d7187;
+}
+.bk-step .step-d b { font-weight: 600; }
 
 /* Page C prepare + reminder */
 .bk-prepare-row {
@@ -890,7 +923,7 @@
   top: calc(882 * var(--bk));
   height: calc(66 * var(--bk));
   padding: 0 calc(44 * var(--bk));
-  background: #6fa9e4;
+  background: #3899ff;
   color: #fff;
   border: none;
   border-radius: calc(141 * var(--bk));
@@ -899,7 +932,7 @@
   cursor: pointer;
   transition: background .2s;
 }
-.bk-return:hover { background: #589ce0; }
+.bk-return:hover { background: #1676d3; }
 
 .bk-dots {
   position: absolute;
@@ -934,21 +967,14 @@
 }
 
 /* ============================================================
-   HERO TICKET (homepage hero replaced after booking)
+   HERO TICKET
 ============================================================ */
 
 .hero-ticket {
   position: relative;
   display: none;
-  /* --pad mirrors the exact side padding used by .machine-tabs-bar__inner and
-     .machine-list (clamp(.., 10.42vw, 200px)), so width/margin below (computed
-     against .hero's own rendered width, same 1920-max/margin:auto box as those
-     containers) put the ticket's left/right edges flush with the machine-type
-     tab text's left edge and the machine-card row's right edge at any viewport. */
+  /* --pad matches .machine-tabs-bar__inner / .machine-list so the edges line up */
   --pad: clamp(1px, 10.42vw, 200px);
-  /* --hu only drives the internal artwork scale (child rules below); it's a
-     vw-based approximation of width/1591 and doesn't need to be exact — the
-     flexible stub (right: 0) absorbs the small resulting slack. */
   --hu: min(calc(100vw * 1520 / 1591 / 1920), calc(1520px / 1591));
   width: calc(100% - 2 * var(--pad));
   height: calc(528 * var(--hu));
@@ -977,11 +1003,7 @@
   height: 100%;
 }
 
-/* Peeking prev/next arrows — each sits half on/half off the ticket's edge
-   (Figma "Ticket_swap_left"/"Ticket_swap_right" buttons), centered on that
-   edge so they mirror each other. Only the sides with another booking to
-   swap to are shown: prev appears once you've moved off the first ticket,
-   next appears while a later one exists. */
+/* Prev/next arrows, half on and half off the ticket edge */
 .hero-ticket__nav {
   position: absolute;
   top: 50%;
@@ -1005,7 +1027,6 @@
 .hero-ticket__nav--prev { left: calc(-35 * var(--hu)); }
 .hero-ticket__nav--next { left: calc(1556 * var(--hu)); }
 
-/* Page dots — active booking renders as a wide pill, the rest as small dots. */
 .hero-ticket__dots {
   position: absolute;
   left: 50%;
@@ -1057,7 +1078,7 @@
   position: absolute;
   inset: 0 0 auto 0;
   height: calc(100 * var(--hu));
-  background: #3487d9;
+  background: #006cd6;
   border-top-left-radius: calc(32 * var(--hu));
   color: #e1ecfd;
   font-size: calc(58.6 * var(--hu));
@@ -1082,7 +1103,7 @@
   margin: 0;
   font-size: calc(58.6 * var(--hu));
   font-weight: 600;
-  color: #007ffe;
+  color: #0a86ff;
   white-space: nowrap;
 }
 .hero-ticket__meta {
@@ -1091,7 +1112,7 @@
   top: calc(280 * var(--hu));
   display: flex;
   gap: calc(107 * var(--hu));
-  color: #035ab0;
+  color: #0055a8;
 }
 .hero-ticket__meta p { margin: 0; white-space: nowrap; }
 .hero-ticket__meta .l { font-size: calc(29.5 * var(--hu)); font-weight: 500; }
@@ -1102,7 +1123,7 @@
   top: calc(428 * var(--hu));
   width: calc(885 * var(--hu));
   height: calc(60 * var(--hu));
-  background: #007ffe;
+  background: #006cd6;
   border-radius: calc(50 * var(--hu));
   display: flex;
   align-items: center;
@@ -1115,12 +1136,9 @@
   z-index: 1;
 }
 .hero-ticket__when img { width: calc(18 * var(--hu)); }
-/* "Next Wednesday" is the longest possible label — nudge its content left so
-   the arrow icon clears the pill's rounded cap instead of overflowing it. */
+/* Longest label: nudge left so the arrow clears the rounded cap */
 .hero-ticket__when--long { padding-left: calc(520 * var(--hu)); }
-/* "This Wednesday" overflows past the pill's fixed right edge into the
-   "More" button — anchor by the right edge instead and let the box grow
-   leftward (clipped off-canvas by .hero-ticket__main) to fit the content. */
+/* Anchor right so the label grows leftward instead of into "More" */
 .hero-ticket__when--wide {
   left: auto;
   right: calc(480 * var(--hu));
@@ -1133,8 +1151,8 @@
   top: calc(430 * var(--hu));
   width: calc(417 * var(--hu));
   height: calc(56 * var(--hu));
-  background: #007fff;
-  color: #fff;
+  background: #0a86ff;
+  color: #f2f5f8;
   border: none;
   border-radius: calc(50 * var(--hu));
   font-family: inherit;
@@ -1142,7 +1160,7 @@
   cursor: pointer;
   transition: background .2s;
 }
-.hero-ticket__more:hover { background: #0069d4; }
+.hero-ticket__more:hover { background: #006cd6; }
 
 .hero-ticket__stub {
   position: absolute;
@@ -1155,12 +1173,7 @@
   border-left: calc(3 * var(--hu)) dashed #e8eef0;
   overflow: hidden;
 }
-.hero-ticket__stub-head {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: calc(100 * var(--hu));
-  background: #176dc1;
-}
+.hero-ticket__stub-head { display: none; }
 .hero-ticket__stub p {
   position: absolute;
   margin: 0;
@@ -1194,15 +1207,9 @@
   color: #fff;
 }
 
-
 /* ============================================================
-   TICKET DETAIL POPUP (hero ticket "More")
-   Figma node 893:5638 (detail), 893:5723 (cancel confirm),
-   893:5785 (empty state after cancel).
-   Same convention as .mpop-*: --u = 1px of the 1171px-wide
-   design frame, every dimension is the raw Figma value * --u.
-   Chrome (tabs + close) lives outside the scrollport so it
-   never moves; the card scrolls behind it.
+   TICKET DETAIL POPUP
+   --u = 1px of the 1171px-wide Figma frame
 ============================================================ */
 
 .tkpop-overlay {
@@ -1246,7 +1253,7 @@
   transition: transform 0.28s ease, opacity 0.22s ease;
 }
 
-/* ---- Fixed chrome: tabs pill + close ---- */
+/* ---- Tabs + close ---- */
 .tkpop-topbar {
   position: absolute;
   top: calc(35.1 * var(--u));
@@ -1258,27 +1265,32 @@
   z-index: 30;
   pointer-events: none;
 }
-.tkpop-topbar > * { pointer-events: auto; }
+.tkpop-topbar > * { pointer-events: auto; min-width: 0; }
 
 .tkpop-tabs {
   position: relative;
   display: flex;
   align-items: center;
-  padding: calc(4.5 * var(--u));
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: calc(6 * var(--u)) calc(7 * var(--u));
   background: rgba(249, 253, 255, 0.85);
   backdrop-filter: blur(calc(4 * var(--u)));
   -webkit-backdrop-filter: blur(calc(4 * var(--u)));
   border-radius: 900px;
 }
 .tkpop-tabs[hidden] { display: none; }
+.tkpop-tabs::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 .tkpop-tab-indicator {
   position: absolute;
-  top: calc(4.5 * var(--u));
+  top: calc(6 * var(--u));
   left: 0;
   width: 0;
   height: calc(58.5 * var(--u));
-  background: #85b7ff;
+  background: #6bb3ff;
   border-radius: 900px;
   pointer-events: none;
   transition: left 0.38s cubic-bezier(0.59, -0.33, 0.36, 1.26),
@@ -1288,6 +1300,7 @@
 .tkpop-tab {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
   height: calc(58.5 * var(--u));
   padding: 0 calc(21 * var(--u));
   border: none;
@@ -1301,7 +1314,7 @@
   white-space: nowrap;
   transition: color 0.2s;
 }
-.tkpop-tab.is-active { color: #f9fdff; }
+.tkpop-tab.is-active { color: #f2f5f8; }
 
 .tkpop-close {
   position: relative;
@@ -1343,7 +1356,7 @@
 }
 .tkpop-scrollport::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
-/* ---- Card (whole frame scrolls; chrome floats above it) ---- */
+/* ---- Card ---- */
 .tkpop-card {
   margin-top: var(--tkpop-pad-top);
   min-height: calc(100% - var(--tkpop-pad-top));
@@ -1353,7 +1366,7 @@
 }
 .tkpop-card[hidden] { display: none; }
 
-/* ---- Empty state (893:5785) ---- */
+/* ---- Empty state ---- */
 .tkpop-empty {
   margin-top: var(--tkpop-pad-top);
   height: calc(100% - var(--tkpop-pad-top));
@@ -1371,7 +1384,7 @@
   color: #4d7187;
 }
 
-/* ---- Top grid: machine card + visit/session ---- */
+/* ---- Top grid ---- */
 .tkpop-top-grid {
   display: grid;
   grid-template-columns: calc(572.4 * var(--u)) 1fr;
@@ -1599,15 +1612,18 @@
   gap: calc(20.3 * var(--u));
   margin-top: calc(24 * var(--u));
 }
-.tkpop-steps-row { display: flex; gap: calc(17.8 * var(--u)); }
+.tkpop-steps-row { display: flex; align-items: stretch; gap: calc(17.8 * var(--u)); }
 .tkpop-step {
   position: relative;
   overflow: hidden;
   flex: 1 1 0;
-  height: calc(168 * var(--u));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: calc(168 * var(--u));
   border-radius: calc(14.5 * var(--u));
 }
-.tkpop-step--wide { height: calc(168.4 * var(--u)); }
+.tkpop-step--wide { min-height: calc(168.4 * var(--u)); }
 .tkpop-step--round-tr { border-top-right-radius: calc(106.6 * var(--u)); }
 .tkpop-step--round-br { border-bottom-right-radius: calc(106.6 * var(--u)); }
 .tkpop-step > img.bg {
@@ -1622,45 +1638,46 @@
   inset: 0;
   background: linear-gradient(to right, rgba(58, 60, 72, 0.88), rgba(76, 78, 91, 0) 75%);
 }
-.tkpop-step p {
-  margin: 0;
-  position: absolute;
-  left: calc(17 * var(--u));
-  color: #fff;
+/* Step header, floating over the photo */
+.tkpop-step .step-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(8 * var(--u));
+  padding: calc(13 * var(--u)) calc(17 * var(--u)) 0;
 }
-.tkpop-step .step-n { top: calc(13 * var(--u)); font-size: calc(16 * var(--u)); }
+.tkpop-step .step-head p { margin: 0; color: #fff; }
+.tkpop-step .step-n { font-size: calc(16 * var(--u)); }
 .tkpop-step .step-h {
-  top: calc(33.8 * var(--u));
+  margin-top: calc(4 * var(--u)) !important;
   font-size: calc(21 * var(--u));
   font-weight: 600;
   white-space: nowrap;
 }
-.tkpop-step .step-d {
-  top: calc(113.7 * var(--u));
-  width: calc(258 * var(--u));
-  font-size: calc(16 * var(--u));
-  line-height: 1.4;
-}
-.tkpop-step--wide .step-d { width: calc(386 * var(--u)); }
-.tkpop-step .step-d b { font-weight: 600; }
 .tkpop-step .arr {
-  position: absolute;
-  right: calc(24.3 * var(--u));
-  top: calc(16.3 * var(--u));
+  flex: none;
   width: calc(27.7 * var(--u));
   height: calc(29.1 * var(--u));
 }
-.tkpop-step .arr--down {
-  top: auto;
-  bottom: calc(13.8 * var(--u));
-  transform: rotate(90deg);
-}
+.tkpop-step .arr--down { transform: rotate(90deg); }
 .tkpop-step .arr--left { transform: rotate(180deg); }
+.tkpop-step .step-bar {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.9);
+  padding: calc(10 * var(--u)) calc(22 * var(--u));
+}
+.tkpop-step .step-d {
+  margin: 0;
+  font-size: calc(16 * var(--u));
+  line-height: 1.4;
+  color: #4d7187;
+}
+.tkpop-step .step-d b { font-weight: 600; }
 
-/* ---- Cancel-booking confirmation (893:5723) ----
-   Floats above the cancel button (positioned via JS in tkOpenCancel) instead
-   of a centered modal, so the page behind stays undarkened; the overlay is
-   just a full-viewport click-catcher for outside-click-to-close. */
+/* ---- Cancel confirmation (positioned by tkPositionCancelPanel) ---- */
 .tkpop-cancel-overlay {
   position: fixed;
   inset: 0;
@@ -1742,7 +1759,7 @@
 .tkpop-cancel-return:hover { filter: brightness(0.92); transform: scale(1.03); }
 .tkpop-cancel-confirm {
   left: calc(40.5 * var(--u));
-  background: #007fff;
+  background: #0a86ff;
   color: #fff;
 }
 .tkpop-cancel-return {
@@ -1751,16 +1768,371 @@
   color: #000;
 }
 
-/* While the confirm panel is open the button's top is hidden under it, so it
-   must read as part of the panel: same red as .tkpop-cancel, no hover
-   motion/recolor, and no transition so tkPositionCancelPanel measures the
-   untransformed rect. */
+/* No hover/transition while tucked under the confirm panel, so JS measures the real rect */
 .tkpop-cancel-btn.is-under-confirm,
 .tkpop-cancel-btn.is-under-confirm:hover {
   background: #ef574c;
-  border-radius: calc(18 * var(--u)); /* 893:5721: not a pill in this state; the
-    18u corner is shallow enough to hide fully under the panel overlap */
+  border-radius: calc(18 * var(--u));
   transform: none;
   transition: none;
   cursor: default;
 }
+
+/* ============================================================
+   MOBILE BOOKING FLOW
+============================================================ */.mlist-cta*, which already prove that out at
+   phone widths. Desktop never opens these (JS only reaches them via
+   isMobileDevice()), but they're hidden under html.is-desktop too as
+   a defensive backstop, matching .mlist-cta's own default-hidden style.
+============================================================ */
+
+.bkp-view { display: none; }
+html.is-desktop .bkp-view { display: none !important; }
+
+/* html.is-mobile is set once at load, so hide phone UI if resized to desktop width */
+@media (min-width: 701px) {
+  #bkp-select, #bkp-info, #bkp-manage-overlay, .bkp-manage-cancel-overlay,
+  #mlist-cta, .mlist-cta-fade, #machine-popup-mobile {
+    display: none !important;
+  }
+}
+
+/* ---------- Shared full-screen page ---------- */
+.bkp-view {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: #e8eef0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  font-family: 'Poppins', sans-serif;
+}
+.bkp-view.is-open { display: block; }
+
+.bkp-notch {
+  position: absolute;
+  top: 13px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 37px;
+  height: 3px;
+  border-radius: 19px;
+  background: #4d7187;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.bkp-page { padding: 28px 16px 48px; display: none; }
+.bkp-page.is-active { display: block; }
+
+.bkp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.bkp-header-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #7399af;
+}
+.bkp-close {
+  width: 41px;
+  height: 41px;
+  flex: none;
+  background: #f2f5f8;
+  opacity: 0.8;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.bkp-close img { width: 10px; }
+
+.bkp-h { margin: 0 0 8px; font-size: 21px; font-weight: 600; color: #4d7187; }
+.bkp-sub { margin: 0 0 16px; font-size: 15px; color: #4d7187; }
+.bkp-block { margin-bottom: 20px; }
+.bkp-block--center { text-align: center; }
+.bkp-block .bkp-h { text-align: left; }
+
+/* ---------- Select + Confirm ---------- */
+.bkp-machine { margin-bottom: 30px; }
+.bkp-machine-name { margin: 0 0 15px; font-size: 21px; font-weight: 600; color: #273944; }
+.bkp-machine-photo { height: 234px; border-radius: 11px; overflow: hidden; background: #fff; }
+.bkp-machine-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.bkp-cal { display: flex; flex-direction: column; gap: 1px; align-items: center; }
+.bkp-cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 0 0 12px;
+}
+.bkp-cal-arrow { background: none; border: none; padding: 0; cursor: pointer; display: flex; }
+.bkp-cal-arrow img { width: 15px; }
+.bkp-cal-arrow:disabled { opacity: 0.3; cursor: default; }
+.bkp-cal-month { margin: 0; display: flex; gap: 9px; font-size: 18px; font-weight: 600; color: #4d7187; white-space: nowrap; }
+.bkp-cal-dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: #4d7187;
+  padding-bottom: 6px;
+}
+.bkp-cal-dow .we { color: #6bb3ff; }
+.bkp-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 8px;
+  column-gap: 4px;
+  width: 100%;
+}
+.bkp-cal-day {
+  height: 32px;
+  background: #fff;
+  border: none;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 15px;
+  color: #4d7187;
+  cursor: pointer;
+}
+.bkp-cal-day.is-we { color: #6bb3ff; }
+.bkp-cal-day:disabled { background: #fbfbfb; color: #c1d2dc; opacity: 0.7; cursor: default; }
+.bkp-cal-day.is-selected { background: #6fa9e4; color: #fff; font-weight: 600; }
+.bkp-cal-day.is-outside { visibility: hidden; }
+
+.bkp-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+.bkp-slot {
+  height: 44px;
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  color: #4d7187;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+.bkp-slot .t { font-size: 15px; font-weight: 600; }
+.bkp-slot .d { font-size: 12px; }
+.bkp-slot.is-selected { background: #6fa9e4; color: #fff; }
+.bkp-slot:disabled { background: #fbfbfb; color: #cfcfcf; cursor: default; }
+
+.bkp-ticket {
+  background: #e1ecfd;
+  border-radius: 14px;
+  overflow: hidden;
+  text-align: left;
+}
+.bkp-ticket-head {
+  background: #006cd6;
+  color: #f2f5f8;
+  font-size: 15px;
+  padding: 8px 15px;
+}
+.bkp-ticket-body { position: relative; display: flex; align-items: center; min-height: 106px; padding: 10px 12px 10px 122px; }
+.bkp-ticket-printer { position: absolute; left: 8px; top: 6px; width: 108px; height: 106px; object-fit: contain; object-position: bottom; }
+.bkp-ticket-info { flex: 1; min-width: 0; }
+.bkp-ticket-name { margin: 0 0 3px; font-size: 18px; font-weight: 600; color: #006cd6; white-space: nowrap; }
+.bkp-ticket-when {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 14px;
+  padding: 2px 12px 2px 0;
+  background: #006cd6;
+  border-radius: 0 17px 17px 0;
+  color: #f2f5f8;
+  font-size: 10px;
+  white-space: nowrap;
+  margin-bottom: 8px;
+}
+.bkp-ticket-when img { width: 8px; }
+.bkp-ticket-meta { display: flex; gap: 19px; }
+.bkp-ticket-meta p { margin: 0; font-size: 10px; white-space: nowrap; }
+.bkp-ticket-meta .l { color: #131b20; }
+.bkp-ticket-meta .v { color: #273944; }
+
+.bkp-safetywrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 24px; }
+.bkp-safety { display: flex; align-items: center; gap: 6px; background: none; border: none; padding: 1px 0; cursor: pointer; }
+.bkp-safety-box { width: 15px; height: 15px; flex: none; border: 1.5px solid #0a86ff; border-radius: 50%; position: relative; }
+.bkp-safety.is-checked .bkp-safety-box { background: #0a86ff; }
+.bkp-safety.is-checked .bkp-safety-box::after {
+  content: '';
+  position: absolute;
+  left: 4px; top: 2px;
+  width: 5px; height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.bkp-safety-text { font-size: 10px; color: #273944; }
+.bkp-safety-text a { color: #0a86ff; }
+
+/* Book Section / Continue pill */
+.bkp-cta { position: relative; width: 100%; }
+.bkp-cta-mascot { position: absolute; right: 12px; top: -20px; width: 33px; height: 49px; color: #0a86ff; pointer-events: none; z-index: 0; }
+.bkp-cta-btn {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 59px;
+  background: #0a86ff;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.bkp-cta-btn:disabled { background: #596979; }
+
+/* ---------- Info wizard ---------- */
+.bkp-info-photo { height: 234px; border-radius: 11px; overflow: hidden; background: #fff; margin-bottom: 16px; }
+.bkp-info-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.bkp-info-row { display: flex; gap: 16px; margin-bottom: 30px; }
+.bkp-info-cards { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.bkp-info-card { background: #f6f6f7; border-radius: 15px; padding: 13px 15px; }
+.bkp-info-card .l { margin: 0 0 4px; font-size: 14px; font-weight: 600; color: #4d7187; }
+.bkp-info-card .sub { margin: 0; font-size: 10px; color: #5b859f; }
+.bkp-info-card .v { margin: 0; font-size: 17px; font-weight: 500; color: #5b859f; }
+
+.bkp-venue-card { position: relative; flex: 1; min-width: 0; border-radius: 18px; overflow: hidden; background: #f6f6f7; }
+.bkp-venue-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.bkp-venue-card .fade {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 58px;
+  background: linear-gradient(to right, rgba(246,246,247,.9), rgba(255,255,255,0));
+  backdrop-filter: blur(1px);
+}
+.bkp-venue-card p { position: relative; margin: 0; padding-left: 15px; }
+.bkp-venue-card .code { padding-top: 26px; font-size: 15px; color: #4d7187; }
+.bkp-venue-card .label { font-size: 21px; font-weight: 600; color: #4d7187; margin-bottom: 12px; }
+
+.bkp-steps { display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px; }
+.bkp-step {
+  position: relative;
+  overflow: hidden;
+  height: 168px;
+  border-radius: 15px;
+  background: #fcfcff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.bkp-step > img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.bkp-step-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(76,78,91,1) 0%, rgba(255,255,255,0) 85%);
+  mix-blend-mode: darken;
+}
+.bkp-step .step-head { position: relative; z-index: 1; padding: 12px 18px 0; color: #e8eef0; }
+.bkp-step .step-head p { margin: 0; }
+.bkp-step .step-n { font-size: 12px; }
+.bkp-step .step-h { margin-top: 2px !important; font-size: 16px; font-weight: 600; color: #fff; }
+.bkp-step .step-bar { position: relative; z-index: 1; background: rgba(255,255,255,.9); padding: 10px; }
+.bkp-step .step-d { margin: 0; font-size: 12px; line-height: 1.4; color: #4d7187; }
+.bkp-step .step-d b { font-weight: 600; }
+
+.bkp-prepare { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+.bkp-prepare-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 0;
+  background: #fcfcff;
+  border-radius: 8px;
+}
+.bkp-prepare-card img { width: 48px; height: 48px; object-fit: contain; }
+.bkp-prepare-card p { margin: 0; font-size: 15px; color: #7091a6; text-align: center; }
+
+/* ============================================================
+   MANAGE BOOKING SHEET
+============================================================ */
+.bkp-manage-title { margin: 0; font-size: 21px; font-weight: 600; color: #7399af; text-align: center; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bkp-manage-nav { width: 41px; height: 41px; flex: none; background: #f2f5f8; opacity: 0.8; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
+.bkp-manage-nav img { width: 10px; }
+.bkp-manage-nav--next img { transform: scaleX(-1); }
+.bkp-manage-nav[hidden] { display: flex; visibility: hidden; } /* keep the slot's width so the title stays centered */
+.bkp-manage-navrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+
+.bkp-manage-cancel {
+  width: 100%;
+  height: 51px;
+  background: #f2685f;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  cursor: pointer;
+}
+.bkp-manage-cancel:active { background: #d9453a; }
+
+.bkp-manage-empty { display: none; align-items: center; justify-content: center; min-height: 200px; padding: 40px 24px; }
+.bkp-manage-empty p { margin: 0; font-size: 21px; font-weight: 500; color: #4d7187; }
+
+.bkp-manage-cancel-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(20, 34, 43, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.bkp-manage-cancel-overlay.is-open { opacity: 1; pointer-events: auto; }
+.bkp-manage-cancel-panel {
+  width: 100%;
+  max-width: 340px;
+  background: #ef574c;
+  color: #fff;
+  border-radius: 20px;
+  padding: 22px 24px 24px;
+  transform: scale(0.9);
+  opacity: 0;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.22s ease;
+}
+.bkp-manage-cancel-overlay.is-open .bkp-manage-cancel-panel { transform: scale(1); opacity: 1; }
+.bkp-manage-cancel-panel p { margin: 0; }
+.bkp-manage-cancel-title { font-size: 21px; font-weight: 600; }
+.bkp-manage-cancel-sub { font-size: 14px; margin-top: 4px; }
+.bkp-manage-cancel-line { border: none; border-top: 1px solid rgba(255,255,255,.9); margin: 16px 0; }
+.bkp-manage-cancel-machine { font-size: 19px; font-weight: 600; }
+.bkp-manage-cancel-time { font-size: 14px; font-weight: 500; margin-top: 4px; }
+.bkp-manage-cancel-actions { display: flex; gap: 10px; margin-top: 20px; }
+.bkp-manage-cancel-confirm, .bkp-manage-cancel-return {
+  flex: 1;
+  height: 44px;
+  border: none;
+  border-radius: 90px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+.bkp-manage-cancel-confirm { background: #0a86ff; color: #fff; }
+.bkp-manage-cancel-return { background: #d9e5ff; color: #000; }

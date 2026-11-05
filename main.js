@@ -35,7 +35,6 @@ function updateHeaderHeight() {
 
 updateHeaderHeight();
 
-// Preserve original CTA SVG paths so logout can restore them
 const ctaPath_lg = document.querySelector('#login-btn-text-lg').getAttribute('d');
 const ctaPath_sm = document.querySelector('#login-btn-text-sm').getAttribute('d');
 
@@ -53,6 +52,7 @@ document.getElementById('login/out-btn').addEventListener('click', function () {
   } else {
     LoggedIn = false;
     loggedOutStatus();
+    refreshLoginDependentButtons();
   }
 });
 
@@ -75,12 +75,10 @@ tabs.forEach(tab => {
   });
 });
 
-// Big hero login button
 document.querySelector('.login-img').addEventListener('click', function () {
   if (!LoggedIn) doLogin();
 });
 
-// Machine card click → show training modal if not passed
 document.querySelectorAll('.machine-card-outer').forEach(cardOuter => {
   cardOuter.addEventListener('click', () => {
     const section = cardOuter.closest('.machine-section');
@@ -91,7 +89,6 @@ document.querySelectorAll('.machine-card-outer').forEach(cardOuter => {
   });
 });
 
-// Training modal buttons
 document.getElementById('training-close').addEventListener('click', closeTrainingModal);
 document.getElementById('training-overlay').addEventListener('click', function (e) {
   if (e.target === this) closeTrainingModal();
@@ -145,6 +142,8 @@ function loggedinStatus(UserID) {
   right_hero_animation.load();
   right_hero_animation.play();
 
+  document.getElementById('login-cta-step-num').textContent = '2';
+
   userID_field.innerText = UserID;
   logout_button.innerText = "Logout";
   logout_button.classList.remove("login");
@@ -164,6 +163,8 @@ function loggedOutStatus() {
   right_hero_animation.src = "assets/Video/Dynamic_Info/notLogin_Animation/video_dynamicinfo_1.webm";
   right_hero_animation.load();
   right_hero_animation.play().catch(() => {});
+
+  document.getElementById('login-cta-step-num').textContent = '1';
 
   userID_field.innerText = '';
   logout_button.innerText = "Login";
@@ -186,6 +187,13 @@ function doLogin() {
     badge.classList.remove('passed', 'notpass');
   });
   setTimeout(setDemoTrainingStatus, 1500);
+  refreshLoginDependentButtons();
+}
+
+function refreshLoginDependentButtons() {
+  if (typeof updateBooknowButton === 'function') updateBooknowButton();
+  if (typeof updateMobileBooknowButton === 'function') updateMobileBooknowButton();
+  if (typeof updateMlistCta === 'function') updateMlistCta();
 }
 
 function setDemoTrainingStatus() {
@@ -205,7 +213,7 @@ function setDemoTrainingStatus() {
 }
 
 function openTrainingModal(machineId) {
-  if (!LoggedIn) return; // training card is only shown to logged-in users
+  if (!LoggedIn) return;
   const data = machineTrainingData[machineId];
   if (!data) return;
   document.getElementById('training-title').textContent = data.title;
@@ -231,6 +239,14 @@ function closeTrainingModal() {
    MACHINE DETAIL POPUP
 ============================================================ */
 
+// Machines in the same category appear as switchable tabs in the popup
+const MPOP_CATEGORY = {
+  bambu: 'printer', creality: 'printer',
+  hybrid: 'laser',
+  versauv: 'uv',
+  einscan: 'scanner', thunk3d: 'scanner',
+};
+
 const MPOP_ICON = 'assets/Icon/Machine Feature/';
 const MPOP_FEATURE_BG = [
   'assets/popup/feature/bambu_feature_1.jpg',
@@ -239,7 +255,6 @@ const MPOP_FEATURE_BG = [
   'assets/popup/feature/bambu_feature_4.jpg',
 ];
 
-/* Reminder / What-to-prepare / FAQ are shared by both 3D printers (Figma "Machine Details") */
 const MPOP_PRINTER_COMMON = {
   chips: [
     { label: 'Training Required ⓘ', cls: 'red'  },
@@ -287,6 +302,8 @@ const machineDetailData = {
       'assets/photos/BambuX1_Carbon1.jpg',
       'assets/photos/BambuX1_Carbon_hover.jpg',
     ],
+    // carousel[0] is square and crops badly in the wide mobile banner
+    mobilePhoto: 'assets/photos/BambuX1_Carbon1.jpg',
     features: [
       { bg: MPOP_FEATURE_BG[0], icon: MPOP_ICON + 'size.svg',
         title: 'Maximum size',
@@ -351,12 +368,251 @@ const machineDetailData = {
     },
     ...MPOP_PRINTER_COMMON,
   },
+  hybrid: {
+    name: 'Hybrid Dual Laser',
+    price: { val: 'Free', unit: '' },
+    chips: [
+      { label: 'Training Required ⓘ', cls: 'red'  },
+      { label: 'Self-Service',        cls: 'blue' },
+    ],
+    specs: [
+      { icon: MPOP_ICON + 'size.svg',      label: 'Maximum working area', val: '1016 × 610 mm' },
+      { icon: MPOP_ICON + 'Material.svg',  label: 'Material',
+        val: 'Non-metals: acrylic, plywood, fabric, leather, fur, paper. Metals: engraving only (Dual Laser models only)' },
+      { icon: MPOP_ICON + 'Thickness.svg', label: 'Thickness',           val: 'Acrylic up to 10mm' },
+    ],
+    tags: ['Single-color', 'Large Printing', 'Multi-material'],
+    carousel: [
+      'assets/photos/Hybrid_DualLaser2.jpg',
+      'assets/photos/Hybrid_DualLaser_hover.jpg',
+    ],
+    features: [
+      { bg: 'assets/popup/feature/hybrid_feature_bed.jpg', icon: MPOP_ICON + 'size.svg',
+        title: 'Maximum size',
+        desc: 'Able to cut pieces up to <b>1016 × 610 mm</b>' },
+      { bg: 'assets/popup/feature/hybrid_feature_materials.jpg', icon: MPOP_ICON + 'Material.svg',
+        title: 'Wide range of<br>materials',
+        desc: 'Supports cutting and engraving on suitable materials such as <b>acrylic, wood</b>, and others approved by lab staff' },
+      { bg: 'assets/popup/feature/hybrid_feature_thickness.jpg', icon: MPOP_ICON + 'Thickness.svg',
+        title: 'Support different<br>thickness',
+        desc: 'Can cut materials up to <b>10 mm thick</b>' },
+      { bg: 'assets/popup/feature/hybrid_feature_software.jpg', icon: MPOP_ICON + 'Coreldraw.svg',
+        title: 'Software Support<br><span class="sub">Corel Draw</span>',
+        desc: 'Use <b>CorelDRAW</b> to set up 2D designs and adjust laser settings' },
+    ],
+    samples: [],
+    priceSection: {
+      headline: 'Free', unit: '',
+      desc: 'No charge for using this machine.',
+    },
+    reminders: [
+      { icon: MPOP_ICON + 'Material.svg', title: 'Bring your own materials',
+        desc: 'We do not provide materials for laser cutting. Please bring your own approved materials.' },
+      { icon: MPOP_ICON + 'size.svg',     title: 'Maximum size',
+        desc: 'Material size must not exceed 1016 × 610 mm.' },
+      { icon: MPOP_ICON + 'Help.svg',     title: 'Ask for help',
+        desc: 'If you are not familiar with the laser settings, please ask Maker Lab staff or student assistant for help.' },
+    ],
+    prepare: [
+      { icon: MPOP_ICON + 'File_format.svg', label: 'CDR, Ai, PDF file' },
+      { icon: MPOP_ICON + 'USB.svg',         label: 'Personal USB drive' },
+      { icon: MPOP_ICON + 'Cash.svg',        label: 'Cash or<br>Octopus Card' },
+    ],
+    faqs: [
+      { q: 'What file format do I need?',
+        a: 'Export your design as a CDR, Ai, or PDF file. Vector paths are used for cutting and engraving; raster images can be used for engraving only.' },
+      { q: 'Can I cut metal?',
+        a: 'Metals can only be engraved, not cut, and only on Dual Laser models. Please check with staff before booking if you plan to work with metal.' },
+      { q: 'What if my booking overruns?',
+        a: 'If your job is not finished when your session ends and another user has booked the next slot, staff and student assistant may remove your material from the machine. Please choose a booking time that fits your estimated job duration.' },
+      { q: 'Will staff help me?',
+        a: 'The laser cutter is self-service. Maker Lab staff and student assistant are available to assist with machine issues and safety.' },
+    ],
+  },
+  versauv: {
+    name: 'VersaUV LEF2-200',
+    price: { val: 'Free', unit: '' },
+    chips: [
+      { label: 'Training Required ⓘ', cls: 'red'  },
+      { label: 'Self-Service',        cls: 'blue' },
+    ],
+    specs: [
+      { icon: MPOP_ICON + 'size.svg',        label: 'Maximum working area',   val: '1016 × 610 mm' },
+      { icon: MPOP_ICON + 'Colour.svg',      label: 'Application',            val: 'CMYK colour printing on flat surfaces' },
+      { icon: MPOP_ICON + 'File_format.svg', label: 'Accepted file formats',  val: 'JPG, EPS, PDF' },
+    ],
+    tags: ['Special effects printing'],
+    carousel: [
+      'assets/photos/Roland_VersaUV1.jpg',
+      'assets/photos/Roland_VersaUV_hover.jpg',
+    ],
+    features: [
+      { bg: 'assets/popup/feature/versauv_feature_object.jpg', icon: MPOP_ICON + 'Direct_print.svg',
+        title: 'Direct printing<br>on objects',
+        desc: 'Print graphics, text, and images directly onto finished items <b>without labels or stickers</b>' },
+      { bg: 'assets/popup/feature/versauv_feature_materials.jpg', icon: MPOP_ICON + 'Material.svg',
+        title: 'Wide material<br>compatibility',
+        desc: 'Capable of printing on both <b>rigid and flexible</b> flat materials' },
+      { bg: 'assets/popup/feature/versauv_feature_swirl.jpg', icon: MPOP_ICON + 'Colour.svg',
+        title: 'Full-colour<br>UV ink',
+        desc: '<b>UV-curable CMYK ink</b> produces vibrant colours and dries instantly after printing' },
+      { bg: 'assets/popup/feature/versauv_feature_uvink.jpg', icon: MPOP_ICON + 'Coating.svg',
+        title: 'No additional<br>coating required',
+        desc: 'Most materials can be printed directly without surface treatment <b>(staff may advise case by case)</b>' },
+    ],
+    samples: [],
+    priceSection: {
+      headline: 'Free', unit: '',
+      desc: 'No charge for using this machine.',
+    },
+    reminders: [
+      { icon: MPOP_ICON + 'Flat_surface.svg',        title: 'Flat surface only',
+        desc: 'Only flat, even surfaces can be printed successfully. Curved or uneven objects are not supported.' },
+      { icon: MPOP_ICON + 'Mirror.svg',              title: 'Non-mirror materials',
+        desc: 'Mirror, highly reflective, or transparent surfaces may affect print quality.' },
+      { icon: MPOP_ICON + 'Material_orientation.svg', title: 'Material condition',
+        desc: 'Material surface must be clean, dry, and free of dust, oil, or protective film.' },
+    ],
+    prepare: [
+      { icon: MPOP_ICON + 'File_format.svg', label: 'JPG, EPS, PDF file' },
+      { icon: MPOP_ICON + 'USB.svg',         label: 'Personal USB drive' },
+      { icon: MPOP_ICON + 'Cash.svg',        label: 'Cash or<br>Octopus Card' },
+    ],
+    faqs: [
+      { q: 'What file format do I need?',
+        a: 'Export your design as a JPG, EPS, or PDF file in CMYK colour mode for the most accurate print result.' },
+      { q: 'Can I print on curved objects?',
+        a: 'No, the VersaUV LEF2-200 only prints on flat, even surfaces.' },
+      { q: 'What if my booking overruns?',
+        a: 'If your job is not finished when your session ends and another user has booked the next slot, staff and student assistant may remove your item from the machine. Please choose a booking time that fits your estimated job duration.' },
+      { q: 'Will staff help me?',
+        a: 'The UV printer is self-service. Maker Lab staff and student assistant are available to assist with machine issues and safety.' },
+    ],
+  },
+  einscan: {
+    name: 'EinScan Pro HD',
+    price: { val: 'Free', unit: '' },
+    chips: [
+      { label: 'Training Required ⓘ', cls: 'red'  },
+      { label: 'Self-Service',        cls: 'blue' },
+    ],
+    specs: [
+      { icon: MPOP_ICON + 'size.svg',           label: 'Maximum scanning size', val: 'Up to 80 x 80 x 60 mm' },
+      { icon: MPOP_ICON + 'Scan_accuracy.svg',  label: 'Scan accuracy',         val: 'Up to 0.01 mm' },
+    ],
+    tags: ['Auto Alignment Scanning'],
+    carousel: [
+      'assets/photos/EinScan_Pro_HD1.jpg',
+      'assets/photos/EinScan_Pro_HD_open.jpg',
+    ],
+    features: [
+      { bg: 'assets/popup/feature/einscan_feature_turntable.jpg', icon: MPOP_ICON + '180.svg',
+        title: 'Fix scan<br>with turntable',
+        desc: 'Provides <b>360° automatic scanning</b> with the turntable' },
+      { bg: 'assets/popup/feature/einscan_feature_handheld.jpg', icon: MPOP_ICON + 'Scan_object.svg',
+        title: 'Handheld scan',
+        desc: 'Can scan <b>large or fixed objects</b>' },
+      { bg: 'assets/popup/feature/einscan_feature_material.jpg', icon: MPOP_ICON + 'Material.svg',
+        title: 'Supports<br>Different materials',
+        desc: 'If your objects are transparent, pure black, or shiny, scanning will work after <b>spraying white powder</b>' },
+      { bg: 'assets/popup/feature/einscan_feature_postprocess.jpg', icon: MPOP_ICON + 'Progress.svg',
+        title: 'Perfect for<br>post-processing',
+        desc: 'Provided <b>3D mesh model for post 3D modeling, 3D printing, accurate measurement</b>' },
+    ],
+    samples: [],
+    priceSection: {
+      headline: 'Free', unit: '',
+      desc: 'No charge for using this machine.',
+    },
+    reminders: [
+      { icon: MPOP_ICON + 'Colour_avoid.svg', title: 'Avoid - Black, transparent, or shiny surfaces',
+        desc: 'Difficult to scan due to absorptive and reflective properties. A white scanning spray must be applied before scanning.' },
+      { icon: MPOP_ICON + 'Symmetric.svg',    title: 'Shapes to avoid - Symmetrical features',
+        desc: 'Hard to align data during scanning.' },
+      { icon: MPOP_ICON + 'size.svg',         title: 'Size limit for scan - 80 x 80 x 60 mm',
+        desc: 'The object must not block the markers on the turntable.' },
+    ],
+    prepare: [
+      { icon: MPOP_ICON + 'Scan_object.svg', label: 'Object to be scanned' },
+      { icon: MPOP_ICON + 'USB.svg',         label: 'Personal USB drive' },
+    ],
+    faqs: [
+      { q: 'What file format do I get?',
+        a: 'Scans are exported as a 3D mesh file suitable for further 3D modelling, 3D printing, or measurement.' },
+      { q: 'Can I scan shiny or transparent objects?',
+        a: 'These need a white scanning spray applied first, as reflective and transparent surfaces cannot be scanned directly.' },
+      { q: 'Will staff help me?',
+        a: 'The 3D scanner is self-service. Maker Lab staff and student assistant are available to assist with machine issues and safety.' },
+    ],
+  },
+  thunk3d: {
+    name: 'Thunk3D JS300',
+    price: { val: 'Free', unit: '' },
+    chips: [
+      { label: 'Training Required ⓘ', cls: 'red'  },
+      { label: 'Self-Service',        cls: 'blue' },
+    ],
+    specs: [
+      { icon: MPOP_ICON + 'size.svg',           label: 'Maximum scanning size', val: 'Up to 80 x 80 x 60 mm' },
+      { icon: MPOP_ICON + 'Scan_accuracy.svg',  label: 'Scan accuracy',         val: 'Up to 0.01 mm' },
+    ],
+    tags: ['Small object Scanning'],
+    carousel: [
+      'assets/photos/Thunk3D_JS300_closed.jpg',
+      'assets/photos/Thunk3D_JS300_open.jpg',
+    ],
+    features: [
+      { bg: 'assets/popup/feature/thunk_feature_unit.jpg', icon: MPOP_ICON + '270.svg',
+        title: 'Extra<br>scanning angle',
+        desc: 'Provides a <b>270° scanning angle</b>, improving coverage and alignment' },
+      { bg: 'assets/popup/feature/thunk_feature_duck.jpg', icon: MPOP_ICON + 'Scan_detail.svg',
+        title: 'Suitable for<br>small objects',
+        desc: 'Provides detailed scans up to <b>0.06 mm</b>, suitable for objects such as jewellery and coins' },
+      { bg: 'assets/popup/feature/thunk_feature_material.jpg', icon: MPOP_ICON + 'Material.svg',
+        title: 'Supports<br>different materials',
+        desc: 'If your objects are transparent, pure black, or shiny, scanning will work after applying <b>white scanning powder</b>' },
+      { bg: 'assets/popup/feature/thunk_feature_postprocess.jpg', icon: MPOP_ICON + 'Progress.svg',
+        title: 'Perfect for<br>post-processing',
+        desc: 'Generates a <b>3D mesh model</b> for post 3D modelling, 3D printing, and accurate measurement' },
+    ],
+    samples: [],
+    priceSection: {
+      headline: 'Free', unit: '',
+      desc: 'No charge for using this machine.',
+    },
+    reminders: [
+      { icon: MPOP_ICON + 'Colour_avoid.svg', title: 'Avoid - Black, transparent, or shiny surfaces',
+        desc: 'Difficult to scan due to absorptive and reflective properties. A white scanning spray must be applied before scanning.' },
+      { icon: MPOP_ICON + 'Symmetric.svg',    title: 'Shapes to avoid - Symmetrical features',
+        desc: 'Hard to align data during scanning.' },
+      { icon: MPOP_ICON + 'size.svg',         title: 'Size limit for scan - 80 x 80 x 60 mm',
+        desc: 'The object must not block the markers on the turntable.' },
+    ],
+    prepare: [
+      { icon: MPOP_ICON + 'Scan_object.svg', label: 'Object to be scanned' },
+      { icon: MPOP_ICON + 'USB.svg',         label: 'Personal USB drive' },
+    ],
+    faqs: [
+      { q: 'What file format do I get?',
+        a: 'Scans are exported as a 3D mesh file suitable for further 3D modelling, 3D printing, or measurement.' },
+      { q: 'Can I scan shiny or transparent objects?',
+        a: 'These need a white scanning spray applied first, as reflective and transparent surfaces cannot be scanned directly.' },
+      { q: 'Will staff help me?',
+        a: 'The 3D scanner is self-service. Maker Lab staff and student assistant are available to assist with machine issues and safety.' },
+    ],
+  },
 };
 
 let currentMachineKey = 'bambu';
 let currentSlide = 0;
 
+function isMobileDevice() {
+  return document.documentElement.classList.contains('is-mobile');
+}
+
 function openMachinePopup(machineKey) {
+  if (isMobileDevice()) { openMobileMachinePopup(machineKey); return; }
+
   currentMachineKey = machineKey || 'bambu';
   currentSlide = 0;
   renderMachinePopup(currentMachineKey);
@@ -372,6 +628,8 @@ function openMachinePopup(machineKey) {
 }
 
 function closeMachinePopup() {
+  if (isMobileDevice()) { closeMobileMachinePopup(); return; }
+
   const overlay = document.getElementById('machine-popup');
   overlay.classList.add('is-closing');
   overlay.setAttribute('aria-hidden', 'true');
@@ -387,21 +645,18 @@ function renderMachinePopup(key) {
 
   document.getElementById('mpopup-machine-title').textContent = data.name;
 
-  // Intro chips + price tab
   document.getElementById('mpopup-chips').innerHTML = data.chips.map(c =>
     `<span class="mpop-intro-chip mpop-intro-chip--${c.cls}">${c.label}</span>`
   ).join('');
   document.getElementById('mpopup-price-badge').innerHTML =
     `<span class="val">${data.price.val}</span><span class="unit">${data.price.unit}</span>`;
 
-  // Carousel slides
   const track = document.getElementById('mpopup-carousel-track');
   track.innerHTML = data.carousel.map(src =>
     `<div class="mpop-carousel-slide"><img src="${src}" alt="${data.name}"></div>`
   ).join('');
   track.style.transform = 'translateX(0)';
 
-  // Dots
   const dotsEl = document.getElementById('mpopup-dots');
   dotsEl.innerHTML = data.carousel.map((_, i) =>
     `<button class="mpop-carousel-dot${i === 0 ? ' is-active' : ''}" data-idx="${i}" aria-label="Slide ${i + 1}"></button>`
@@ -410,7 +665,6 @@ function renderMachinePopup(key) {
     dot.addEventListener('click', () => goToSlide(+dot.dataset.idx));
   });
 
-  // Specs
   document.getElementById('mpopup-spec-list').innerHTML = data.specs.map(s =>
     `<div class="mpop-spec-row">
       <img class="mpop-spec-icon" src="${s.icon}" alt="">
@@ -421,12 +675,10 @@ function renderMachinePopup(key) {
     </div>`
   ).join('');
 
-  // "What can it do?" tags
   document.getElementById('mpopup-tag-list').innerHTML = data.tags.map(t =>
     `<span class="mpop-tag">${t}</span>`
   ).join('');
 
-  // Feature cards (2x2)
   document.getElementById('mpopup-features-grid').innerHTML = data.features.map(f =>
     `<div class="mpop-feature-card">
       <div class="mpop-feature-card-bg" style="background-image:url('${f.bg}')"></div>
@@ -438,7 +690,6 @@ function renderMachinePopup(key) {
     </div>`
   ).join('');
 
-  // Samples
   document.getElementById('mpopup-samples-row').innerHTML = data.samples.map(s =>
     `<div class="mpop-sample-card">
       <img src="${s.img}" alt="Sample work" loading="lazy">
@@ -450,12 +701,10 @@ function renderMachinePopup(key) {
     </div>`
   ).join('');
 
-  // Price section
   document.getElementById('mpopup-price-headline').innerHTML =
     `<span class="val">${data.priceSection.headline}</span><span class="unit">${data.priceSection.unit}</span>`;
   document.getElementById('mpopup-price-desc').textContent = data.priceSection.desc;
 
-  // Reminder cards
   document.getElementById('mpopup-reminder-row').innerHTML = data.reminders.map(r =>
     `<div class="mpop-reminder-card">
       <img class="mpop-reminder-icon" src="${r.icon}" alt="">
@@ -466,7 +715,6 @@ function renderMachinePopup(key) {
     </div>`
   ).join('');
 
-  // What to prepare cards
   document.getElementById('mpopup-prepare-row').innerHTML = data.prepare.map(p =>
     `<div class="mpop-prepare-card">
       <img class="mpop-prepare-icon" src="${p.icon}" alt="">
@@ -474,7 +722,6 @@ function renderMachinePopup(key) {
     </div>`
   ).join('');
 
-  // FAQ
   document.getElementById('mpopup-faq-list').innerHTML = data.faqs.map(f =>
     `<div class="mpop-faq-item">
       <p class="mpop-faq-q">${f.q}</p>
@@ -483,15 +730,19 @@ function renderMachinePopup(key) {
     </div>`
   ).join('');
 
-  // Reset scroll and slide
   const scrollport = document.getElementById('mpopup-scrollport');
   if (scrollport) scrollport.scrollTop = 0;
-  setActiveSideBtn(mpopSideBtns[0]); // back at the top, so About is in view
+  setActiveSideBtn(mpopSideBtns[0]);
 
-  // Sync active tab
-  document.querySelectorAll('.mpop-tab').forEach(tab => {
-    tab.classList.toggle('is-active', tab.dataset.machine === key);
-  });
+  const category = MPOP_CATEGORY[key];
+  const siblings = Object.keys(MPOP_CATEGORY).filter(k => MPOP_CATEGORY[k] === category);
+  const tabsEl = document.getElementById('mpop-tabs');
+  tabsEl.hidden = siblings.length < 2;
+  tabsEl.innerHTML = '<div class="mpop-tab-indicator"></div>' +
+    siblings.map(k =>
+      `<button class="mpop-tab${k === key ? ' is-active' : ''}" data-machine="${k}">${machineDetailData[k].name}</button>`
+    ).join('');
+  requestAnimationFrame(positionTabIndicator);
 }
 
 function goToSlide(idx) {
@@ -513,7 +764,6 @@ function positionTabIndicator() {
   indicator.style.width = activeTab.offsetWidth + 'px';
 }
 
-// Close button
 function updateBooknowButton() {
   const btn = document.getElementById('mpopup-booknow');
   btn.classList.toggle('is-login', !LoggedIn);
@@ -526,19 +776,18 @@ document.getElementById('mpopup-booknow').addEventListener('click', function () 
     updateBooknowButton();
     return;
   }
-  // Booking flow implemented for Bambu X1 only so far (see booking.js)
+  // Only Bambu has a booking flow so far
   if (typeof openBookingFlow === 'function' && currentMachineKey === 'bambu') {
     closeMachinePopup();
     openBookingFlow(currentMachineKey);
   }
 });
 
-// Mascot eyes (Book Now button + booking-flow CTA mascots): follow the cursor, plus occasional blinks.
-// One group per mascot instance — hidden ones (e.g. inactive button state) are skipped via svgRect.width check.
+// Mascot eyes follow the cursor and blink occasionally
 (function () {
   const groups = document.querySelectorAll('.mpop-booknow .bn-eyes, .bk-cta-mascot .bn-eyes');
   if (!groups.length) return;
-  const MAX_OFFSET = 4.5;   // max eye travel, SVG user units
+  const MAX_OFFSET = 4.5; // SVG user units
   let raf = null;
 
   document.addEventListener('mousemove', function (e) {
@@ -548,8 +797,8 @@ document.getElementById('mpopup-booknow').addEventListener('click', function () 
       groups.forEach(function (eyes) {
         const svg = eyes.closest('svg');
         const svgRect = svg.getBoundingClientRect();
-        if (!svgRect.width) return;             // hidden (popup closed / other state showing)
-        const scale = svgRect.width / svg.viewBox.baseVal.width;  // screen px per user unit
+        if (!svgRect.width) return;
+        const scale = svgRect.width / svg.viewBox.baseVal.width;
         const eyeRect = eyes.getBoundingClientRect();
         const dx = (e.clientX - (eyeRect.left + eyeRect.width / 2)) / scale;
         const dy = (e.clientY - (eyeRect.top + eyeRect.height / 2)) / scale;
@@ -574,37 +823,28 @@ document.getElementById('mpopup-booknow').addEventListener('click', function () 
 
 document.getElementById('mpopup-close').addEventListener('click', closeMachinePopup);
 
-// Click outside popup to close
 document.getElementById('machine-popup').addEventListener('click', function (e) {
   if (e.target === this) closeMachinePopup();
 });
 
-// Tab switcher
-document.querySelectorAll('.mpop-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    if (tab.dataset.machine === currentMachineKey) return;
-    currentMachineKey = tab.dataset.machine;
-    renderMachinePopup(currentMachineKey);
-    requestAnimationFrame(positionTabIndicator);
-  });
+// Delegated because the tabs are rebuilt on every render
+document.getElementById('mpop-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.mpop-tab');
+  if (!tab || tab.dataset.machine === currentMachineKey) return;
+  currentMachineKey = tab.dataset.machine;
+  renderMachinePopup(currentMachineKey);
 });
 
-// Carousel arrows
 document.getElementById('mpopup-prev').addEventListener('click', () => goToSlide(currentSlide - 1));
 document.getElementById('mpopup-next').addEventListener('click', () => goToSlide(currentSlide + 1));
 
-// Sidebar nav: click scrolls to the section; the button whose section is
-// currently in view stays extended (is-active), like a real tab.
 const mpopSideBtns = Array.from(document.querySelectorAll('.mpop-side-btn[data-scroll-to]'));
-let mpopSideNavLocked = false; // suppress scrollspy while a click's smooth scroll runs
+let mpopSideNavLocked = false; // pauses scrollspy during click-triggered smooth scroll
 
 function setActiveSideBtn(activeBtn) {
   mpopSideBtns.forEach(b => b.classList.toggle('is-active', b === activeBtn));
 }
 
-// The reading line matches where the click handler parks each section:
-// the card's resting content top (margin-top clears the topbar zone +
-// overlay padding, padding-top gives the title breathing room below it).
 function mpopSectionGap(card) {
   const cardStyle = getComputedStyle(card);
   return (parseFloat(cardStyle.marginTop) || 0) + (parseFloat(cardStyle.paddingTop) || 0);
@@ -616,7 +856,8 @@ function updateSideNav() {
   const card = document.getElementById('mpopup-card');
   if (!scrollport || !card) return;
   const portTop = scrollport.getBoundingClientRect().top;
-  const line = scrollport.scrollTop + mpopSectionGap(card) + 1;
+  const gap = mpopSectionGap(card);
+  const line = scrollport.scrollTop + gap + (scrollport.clientHeight - gap) / 2;
   let active = mpopSideBtns[0];
   mpopSideBtns.forEach(btn => {
     const target = document.getElementById(btn.dataset.scrollTo);
@@ -624,7 +865,7 @@ function updateSideNav() {
     const top = target.getBoundingClientRect().top - portTop + scrollport.scrollTop;
     if (top <= line) active = btn;
   });
-  // Bottomed out: the last section wins even if too short to reach the line
+  // At the bottom, the last section wins even if it's too short to reach the line
   if (scrollport.scrollTop + scrollport.clientHeight >= scrollport.scrollHeight - 2) {
     active = mpopSideBtns[mpopSideBtns.length - 1];
   }
@@ -639,20 +880,18 @@ mpopSideBtns.forEach(btn => {
     const scrollport = document.getElementById('mpopup-scrollport');
     const card = document.getElementById('mpopup-card');
     if (!target || !scrollport || !card) return;
-    // Stop short of the section so its title isn't flush with the card top
     const gap = mpopSectionGap(card);
     const top = target.getBoundingClientRect().top - scrollport.getBoundingClientRect().top + scrollport.scrollTop - gap;
     setActiveSideBtn(btn);
     mpopSideNavLocked = true;
     scrollport.addEventListener('scrollend', () => { mpopSideNavLocked = false; }, { once: true });
-    setTimeout(() => { mpopSideNavLocked = false; }, 1200); // in case scrollend never fires
+    setTimeout(() => { mpopSideNavLocked = false; }, 1200); // fallback if scrollend never fires
     scrollport.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
   });
 });
 
-// Override machine card click: 3D Printer cards open popup; others keep training modal
 document.querySelectorAll('.machine-card-outer').forEach(cardOuter => {
-  // Remove existing listeners by cloning
+  // Cloning strips the earlier listeners
   const clone = cardOuter.cloneNode(true);
   cardOuter.parentNode.replaceChild(clone, cardOuter);
 });
@@ -670,4 +909,242 @@ document.querySelectorAll('.machine-card-outer').forEach(cardOuter => {
     if (badge && badge.classList.contains('passed')) return;
     openTrainingModal(section.id);
   });
+});
+
+/* ============================================================
+   MOBILE MACHINE POPUP
+============================================================ */
+
+function renderMobileMachinePopup(key) {
+  const data = machineDetailData[key];
+  if (!data) return;
+
+  document.getElementById('mpopm-title').textContent = data.name;
+
+  document.getElementById('mpopm-chips').innerHTML = data.chips.map(c =>
+    `<span class="mpopm-chip mpopm-chip--${c.cls}">${c.label}</span>`
+  ).join('');
+
+  document.getElementById('mpopm-price').innerHTML =
+    `<span class="val">${data.price.val}</span><span class="unit">${data.price.unit}</span>`;
+
+  document.getElementById('mpopm-photo').innerHTML =
+    `<img src="${data.mobilePhoto || data.carousel[0]}" alt="${data.name}">`;
+
+  document.getElementById('mpopm-specs').innerHTML = data.specs.map(s =>
+    `<div class="mpopm-spec-row">
+      <img class="mpopm-spec-icon" src="${s.icon}" alt="">
+      <div class="mpopm-spec-text">
+        <p class="mpopm-spec-label">${s.label}</p>
+        <p class="mpopm-spec-val">${s.val}</p>
+      </div>
+    </div>`
+  ).join('');
+
+  document.getElementById('mpopm-features').innerHTML = data.features.map(f =>
+    `<div class="mpopm-feature-card">
+      <div class="mpopm-feature-bg" style="background-image:url('${f.bg}')"></div>
+      <img class="mpopm-feature-icon" src="${f.icon}" alt="">
+      <div class="mpopm-feature-text">
+        <p class="mpopm-feature-title">${f.title}</p>
+        <p class="mpopm-feature-desc">${f.desc}</p>
+      </div>
+    </div>`
+  ).join('');
+
+  document.getElementById('mpopm-reminders').innerHTML = data.reminders.map(r =>
+    `<div class="mpopm-reminder-card">
+      <img class="mpopm-reminder-icon" src="${r.icon}" alt="">
+      <div class="mpopm-reminder-text">
+        <p class="mpopm-reminder-title">${r.title}</p>
+        <p class="mpopm-reminder-desc">${r.desc}</p>
+      </div>
+    </div>`
+  ).join('');
+
+  document.getElementById('mpopm-faq-list').innerHTML = data.faqs.map(f =>
+    `<div class="mpopm-faq-item">
+      <p class="mpopm-faq-q">${f.q}</p>
+      <p class="mpopm-faq-a">${f.a}</p>
+    </div>`
+  ).join('');
+
+  document.getElementById('mpopm-scroll').scrollTop = 0;
+}
+
+function updateMobileBooknowButton() {
+  const label = document.getElementById('mpopm-cta-label');
+  const badge = document.getElementById('mpopm-cta-badge');
+  const btn = document.getElementById('mpopm-cta');
+  label.textContent = LoggedIn ? 'Book Machine Now' : 'Login Now to book';
+  badge.textContent = LoggedIn ? '3' : '1';
+  btn.setAttribute('aria-label', LoggedIn ? 'Book Machine Now' : 'Login to book');
+}
+
+/* ============================================================
+   MOBILE PAGE CTA
+============================================================ */
+
+// bkState is undefined on first run since booking.js loads after main.js
+function updateMlistCta() {
+  const label = document.getElementById('mlist-cta-label');
+  const badge = document.getElementById('mlist-cta-badge');
+  const btn = document.getElementById('mlist-cta');
+  const hasBooking = typeof bkState !== 'undefined' && bkState.bookings.length > 0;
+  if (LoggedIn && hasBooking) {
+    label.textContent = 'Manage Booking';
+    badge.textContent = '4';
+    btn.setAttribute('aria-label', 'Manage Booking');
+  } else {
+    label.textContent = LoggedIn ? 'Book Machine Now' : 'Login Now to book';
+    badge.textContent = LoggedIn ? '3' : '1';
+    btn.setAttribute('aria-label', LoggedIn ? 'Book Machine Now' : 'Login to book');
+  }
+}
+
+document.getElementById('mlist-cta').addEventListener('click', function () {
+  if (!LoggedIn) { doLogin(); return; }
+  const hasBooking = typeof bkState !== 'undefined' && bkState.bookings.length > 0;
+  if (hasBooking && typeof bkpOpenManage === 'function') bkpOpenManage();
+});
+
+updateMlistCta();
+
+function openMobileMachinePopup(machineKey) {
+  currentMachineKey = machineKey || 'bambu';
+  renderMobileMachinePopup(currentMachineKey);
+  updateMobileBooknowButton();
+
+  const overlay = document.getElementById('machine-popup-mobile');
+  const sheet = document.getElementById('mpopm-sheet');
+  sheet.style.transition = '';
+  sheet.style.transform = '';
+  overlay.classList.remove('is-closing');
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileMachinePopup() {
+  const overlay = document.getElementById('machine-popup-mobile');
+  const sheet = document.getElementById('mpopm-sheet');
+  sheet.style.transition = '';
+  sheet.style.transform = '';
+  overlay.classList.add('is-closing');
+  overlay.setAttribute('aria-hidden', 'true');
+  setTimeout(() => {
+    overlay.classList.remove('is-open', 'is-closing');
+    document.body.style.overflow = '';
+  }, 320);
+}
+
+document.getElementById('mpopm-close').addEventListener('click', closeMachinePopup);
+
+document.getElementById('machine-popup-mobile').addEventListener('click', function (e) {
+  if (e.target === this) closeMachinePopup();
+});
+
+document.getElementById('mpopm-cta').addEventListener('click', function () {
+  if (!LoggedIn) {
+    doLogin();
+    updateMobileBooknowButton();
+    return;
+  }
+  // Only Bambu has a booking flow so far
+  if (typeof openBookingFlow === 'function' && currentMachineKey === 'bambu') {
+    closeMachinePopup();
+    openBookingFlow(currentMachineKey);
+  }
+});
+
+// Drag the handle down to dismiss the sheet
+(function () {
+  const sheet = document.getElementById('mpopm-sheet');
+  const handle = document.getElementById('mpopm-handle');
+  if (!sheet || !handle) return;
+
+  const DISMISS_THRESHOLD = 120;
+  let dragging = false;
+  let startY = 0;
+  let deltaY = 0;
+
+  handle.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    startY = e.clientY;
+    deltaY = 0;
+    sheet.style.transition = 'none';
+    handle.setPointerCapture(e.pointerId);
+  });
+
+  handle.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    let dy = e.clientY - startY;
+    if (dy < 0) dy *= 0.3;
+    deltaY = dy;
+    sheet.style.transform = `translateY(${Math.max(dy, -40)}px)`;
+  });
+
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (deltaY > DISMISS_THRESHOLD) {
+      closeMachinePopup();
+    } else {
+      sheet.style.transform = '';
+    }
+    deltaY = 0;
+  }
+
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+})();
+
+function bkpMakeDragHandle(sheet, handle, onDismiss) {
+  if (!sheet || !handle) return;
+  const DISMISS_THRESHOLD = 120;
+  let dragging = false;
+  let startY = 0;
+  let deltaY = 0;
+
+  handle.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    startY = e.clientY;
+    deltaY = 0;
+    sheet.style.transition = 'none';
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    let dy = e.clientY - startY;
+    if (dy < 0) dy *= 0.3;
+    deltaY = dy;
+    sheet.style.transform = `translateY(${Math.max(dy, -40)}px)`;
+  });
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (deltaY > DISMISS_THRESHOLD) {
+      onDismiss();
+    } else {
+      sheet.style.transform = '';
+    }
+    deltaY = 0;
+  }
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+}
+
+bkpMakeDragHandle(
+  document.getElementById('bkp-manage-sheet'),
+  document.getElementById('bkp-manage-handle'),
+  () => { if (typeof bkpCloseManage === 'function') bkpCloseManage(); }
+);
+
+document.getElementById('bkp-manage-overlay').addEventListener('click', function (e) {
+  if (e.target === this && typeof bkpCloseManage === 'function') bkpCloseManage();
+});
+document.getElementById('bkp-manage-cancel-overlay').addEventListener('click', function (e) {
+  if (e.target === this && typeof bkpCloseCancelPanel === 'function') bkpCloseCancelPanel();
 });
