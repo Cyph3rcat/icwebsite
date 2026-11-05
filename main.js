@@ -79,16 +79,6 @@ document.querySelector('.login-img').addEventListener('click', function () {
   if (!LoggedIn) doLogin();
 });
 
-document.querySelectorAll('.machine-card-outer').forEach(cardOuter => {
-  cardOuter.addEventListener('click', () => {
-    const section = cardOuter.closest('.machine-section');
-    if (!section) return;
-    const badge = section.querySelector('.badge-training');
-    if (badge && badge.classList.contains('passed')) return;
-    openTrainingModal(section.id);
-  });
-});
-
 document.getElementById('training-close').addEventListener('click', closeTrainingModal);
 document.getElementById('training-overlay').addEventListener('click', function (e) {
   if (e.target === this) closeTrainingModal();
@@ -888,12 +878,6 @@ mpopSideBtns.forEach(btn => {
     setTimeout(() => { mpopSideNavLocked = false; }, 1200); // fallback if scrollend never fires
     scrollport.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
   });
-});
-
-document.querySelectorAll('.machine-card-outer').forEach(cardOuter => {
-  // Cloning strips the earlier listeners
-  const clone = cardOuter.cloneNode(true);
-  cardOuter.parentNode.replaceChild(clone, cardOuter);
 });
 
 document.querySelectorAll('.machine-card-outer').forEach(cardOuter => {
