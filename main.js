@@ -1,3 +1,5 @@
+import { bkState, bkOnLogout, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow } from './booking.js';
+
 var LoggedIn = false;
 
 const machineTrainingData = {
@@ -166,7 +168,7 @@ function loggedOutStatus() {
     badge.classList.remove('passed', 'notpass');
   });
 
-  if (typeof bkOnLogout === 'function') bkOnLogout();
+  bkOnLogout();
 }
 
 function doLogin() {
@@ -181,9 +183,9 @@ function doLogin() {
 }
 
 function refreshLoginDependentButtons() {
-  if (typeof updateBooknowButton === 'function') updateBooknowButton();
-  if (typeof updateMobileBooknowButton === 'function') updateMobileBooknowButton();
-  if (typeof updateMlistCta === 'function') updateMlistCta();
+  updateBooknowButton();
+  updateMobileBooknowButton();
+  updateMlistCta();
 }
 
 function setDemoTrainingStatus() {
@@ -767,7 +769,7 @@ document.getElementById('mpopup-booknow').addEventListener('click', function () 
     return;
   }
   // Only Bambu has a booking flow so far
-  if (typeof openBookingFlow === 'function' && currentMachineKey === 'bambu') {
+  if (currentMachineKey === 'bambu') {
     closeMachinePopup();
     openBookingFlow(currentMachineKey);
   }
@@ -969,12 +971,11 @@ function updateMobileBooknowButton() {
    MOBILE PAGE CTA
 ============================================================ */
 
-// bkState is undefined on first run since booking.js loads after main.js
 function updateMlistCta() {
   const label = document.getElementById('mlist-cta-label');
   const badge = document.getElementById('mlist-cta-badge');
   const btn = document.getElementById('mlist-cta');
-  const hasBooking = typeof bkState !== 'undefined' && bkState.bookings.length > 0;
+  const hasBooking = bkState.bookings.length > 0;
   if (LoggedIn && hasBooking) {
     label.textContent = 'Manage Booking';
     badge.textContent = '4';
@@ -988,8 +989,8 @@ function updateMlistCta() {
 
 document.getElementById('mlist-cta').addEventListener('click', function () {
   if (!LoggedIn) { doLogin(); return; }
-  const hasBooking = typeof bkState !== 'undefined' && bkState.bookings.length > 0;
-  if (hasBooking && typeof bkpOpenManage === 'function') bkpOpenManage();
+  const hasBooking = bkState.bookings.length > 0;
+  if (hasBooking) bkpOpenManage();
 });
 
 updateMlistCta();
@@ -1035,7 +1036,7 @@ document.getElementById('mpopm-cta').addEventListener('click', function () {
     return;
   }
   // Only Bambu has a booking flow so far
-  if (typeof openBookingFlow === 'function' && currentMachineKey === 'bambu') {
+  if (currentMachineKey === 'bambu') {
     closeMachinePopup();
     openBookingFlow(currentMachineKey);
   }
@@ -1123,12 +1124,22 @@ function bkpMakeDragHandle(sheet, handle, onDismiss) {
 bkpMakeDragHandle(
   document.getElementById('bkp-manage-sheet'),
   document.getElementById('bkp-manage-handle'),
-  () => { if (typeof bkpCloseManage === 'function') bkpCloseManage(); }
+  () => bkpCloseManage()
 );
 
 document.getElementById('bkp-manage-overlay').addEventListener('click', function (e) {
-  if (e.target === this && typeof bkpCloseManage === 'function') bkpCloseManage();
+  if (e.target === this) bkpCloseManage();
 });
 document.getElementById('bkp-manage-cancel-overlay').addEventListener('click', function (e) {
-  if (e.target === this && typeof bkpCloseCancelPanel === 'function') bkpCloseCancelPanel();
+  if (e.target === this) bkpCloseCancelPanel();
 });
+
+export {
+  LoggedIn,
+  isMobileDevice,
+  openMachinePopup,
+  closeMachinePopup,
+  openMobileMachinePopup,
+  closeMobileMachinePopup,
+  updateMlistCta,
+};

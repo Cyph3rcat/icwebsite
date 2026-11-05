@@ -1,4 +1,7 @@
-// Depends on main.js (LoggedIn, closeMachinePopup, openMachinePopup)
+import {
+  LoggedIn, isMobileDevice, openMachinePopup, closeMachinePopup,
+  openMobileMachinePopup, closeMobileMachinePopup, updateMlistCta,
+} from './main.js';
 
 const bkMachineData = {
   bambu: {
@@ -574,7 +577,7 @@ function bkpCloseSelect(reopenPopup) {
   const machine = bkState.machine;
   $bk('bkp-select').classList.remove('is-open');
   document.body.style.overflow = '';
-  if (reopenPopup && typeof openMobileMachinePopup === 'function') openMobileMachinePopup(machine);
+  if (reopenPopup) openMobileMachinePopup(machine);
 }
 
 function bkpRenderSelect() {
@@ -693,7 +696,7 @@ function bkpInfoContinue() {
 function bkpFinishInfo() {
   $bk('bkp-info').classList.remove('is-open');
   document.body.style.overflow = '';
-  if (typeof updateMlistCta === 'function') updateMlistCta();
+  updateMlistCta();
   window.scrollTo({ top: 0 });
 }
 
@@ -790,7 +793,7 @@ function bkpConfirmCancel() {
   bkpCloseCancelPanel();
   bkpRenderManage();
   $bk('bkp-manage-scroll').scrollTop = 0;
-  if (typeof updateMlistCta === 'function') updateMlistCta();
+  updateMlistCta();
   if (!bkState.bookings.length) bkpCloseManage();
 }
 
@@ -830,8 +833,7 @@ window.addEventListener('resize', () => {
     $bk('bkp-manage-overlay').classList.remove('is-open', 'is-closing');
     $bk('bkp-manage-overlay').setAttribute('aria-hidden', 'true');
   }
-  if (typeof closeMobileMachinePopup === 'function' &&
-      $bk('machine-popup-mobile').classList.contains('is-open')) {
+  if ($bk('machine-popup-mobile').classList.contains('is-open')) {
     closeMobileMachinePopup();
   }
   document.body.style.overflow = '';
@@ -921,3 +923,5 @@ document.addEventListener('keydown', e => {
   else if ($bk('tkpop-cancel-overlay').classList.contains('is-open')) tkCloseCancel();
   else if ($bk('ticket-popup').classList.contains('is-open')) closeTicketPopup();
 });
+
+export { bkState, bkOnLogout, bkpCloseCancelPanel, bkpCloseManage, bkpOpenManage, openBookingFlow };
