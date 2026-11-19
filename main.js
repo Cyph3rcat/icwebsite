@@ -239,9 +239,6 @@ function closeTrainingModal() {
   document.body.style.overflow = '';
 }
 
-/* ============================================================
-   MACHINE DETAIL POPUP
-============================================================ */
 
 // Machines in the same category appear as switchable tabs in the popup
 const MPOP_CATEGORY = {
@@ -975,10 +972,6 @@ function updateMobileBooknowButton() {
   badge.textContent = LoggedIn ? '3' : '1';
   btn.setAttribute('aria-label', LoggedIn ? 'Book Machine Now' : 'Login to book');
 }
-
-/* ============================================================
-   MOBILE PAGE CTA
-============================================================ */
 
 function updateMlistCta() {
   const label = document.getElementById('mlist-cta-label');
