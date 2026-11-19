@@ -57,21 +57,22 @@ img, video {
   max-width: 100%; 
 }
 
-button { 
-  cursor: pointer; 
-  border: none; 
-  background: none; 
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
 }
 
 /* HERO */
-.hero { 
+.hero {
   position: relative;
   justify-content: center;
   display: flex;
   max-width: 1920px;
   gap: clamp(1px, 3.438vw, 66px);
   margin: 0 auto;
-  overflow: hidden; 
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .hero-bg-circle {
@@ -438,7 +439,7 @@ button {
   color: #F5F8F9;
 }
 
-/* â”€â”€ MACHINE DETAIL LIST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* MACHINE DETAIL LIST */
 .machine-list {
   max-width: 1920px;
   margin: 0 auto;
@@ -519,16 +520,14 @@ button {
   background: #C0392B;
 }
 
-/* â”€â”€ Machine card grids â”€â”€ */
+/* Machine card grids */
 
-/* 2-column (3D Printer): always exactly 2 equal columns, stacks at narrow viewports */
 .machine-cards--two {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: clamp(10px, 2.5vw, 48px);
 }
 
-/* 1-machine sections: card fills left half, empty right half */
 .machine-cards--one {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -536,9 +535,7 @@ button {
 }
 .machine-cards--one .machine-card-outer { grid-column: 1 / 2; }
 
-/* â”€â”€ Machine card â”€â”€ */
-/* aspect-ratio 735:477 from Figma â€” consistent across all machine types */
-/* Wrapper holds the card + the mascot that overflows above */
+/* Machine card */
 .machine-card-outer {
   position: relative;
   cursor: pointer;
@@ -561,7 +558,6 @@ button {
   z-index: 1;
 }
 
-/* Deco mascot â€” sits above the card, animated on hover */
 .machine-card__mascot {
   position: absolute;
   left: 85.7%;
@@ -580,11 +576,7 @@ button {
   transform: translateY(0) scale(1);
 }
 
-/* Photo fills entire card absolutely.
-   Edges extend 1px past the card so the blue card bg can't peek through
-   as a subpixel seam at fractional zoom/DPR levels.
-   On hover the wrap's bottom is pulled up by the detail-bar height and its
-   bottom corners round off, so the photo ends above the detail bar. */
+/* Extends 1px past the card to hide subpixel seams */
 .machine-card__photo-wrap {
   position: absolute;
   top: -1px;
@@ -621,7 +613,6 @@ button {
 }
 .machine-card-outer:hover .machine-card__photo--hover { opacity: 1; }
 
-/* Info panel: anchored at card bottom, initially offset so only name-bar shows */
 .machine-card__info {
   position: absolute;
   bottom: 0;
@@ -632,8 +623,6 @@ button {
   transform: translateY(clamp(50px, 5.61vw, 108px));
   transition: transform 500ms cubic-bezier(0.34, 1.2, 0.64, 1);
 }
-/* Info stays transparent on hover: the photo shows through to the right of
-   the name-bar tab instead of a full-width blue strip (Figma hover frame). */
 .machine-card-outer:hover .machine-card__info {
   transform: translateY(0);
 }
@@ -641,8 +630,7 @@ button {
 .machine-card__name-bar {
   display: inline-block;
   background: var(--bg);
-  /* Overshoot the card's left clip edge by 1px: flush fractional-pixel edges
-     antialias separately and let the photo bleed through as a vertical seam. */
+  /* 1px overshoot hides a subpixel seam */
   margin-left: -1px;
   padding: clamp(8px, 0.891vw, 17px) clamp(12px, 1.336vw, 26px);
   border-radius: clamp(20px, 2.226vw, 43px) clamp(20px, 2.226vw, 43px) 0 0;
@@ -664,9 +652,7 @@ button {
 
 .machine-card__detail-bar {
   background: var(--blue);
-  /* Overlap the name-bar above by 1px: their shared edge sits on a fractional
-     pixel, and without overlap the photo behind bleeds through as a hairline
-     seam (worst while the hover transition runs). */
+  /* 1px overlap hides a subpixel seam */
   margin-top: -1px;
   padding: clamp(2px, 0.223vw, 4px) clamp(14px, 1.559vw, 30px) clamp(4px, 0.445vw, 9px);
   display: flex;
@@ -704,7 +690,7 @@ button {
 .price-val  { font-size: clamp(20px, 2.708vw, 52px); line-height: 1; }
 .price-unit { font-size: clamp(12px, 1.336vw, 26px); line-height: 1; }
 
-/* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Responsive */
 
 /* Tablet: single-machine cards go full width */
 @media (max-width: 1100px) {
@@ -732,11 +718,177 @@ button {
   }
 }
 
-@media screen and (max-width: 768px) {
+/* ============================================================
+   MOBILE HOME PAGE
+============================================================ */
+@media screen and (max-width: 700px) {
 
+  /* Gated on html.is-mobile (set from the UA at load), not just width */
+
+  /* Hero */
+  html.is-mobile .hero {
+    flex-direction: column;
+    align-items: center;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 16px 0;
+    gap: 0;
+  }
+  html.is-mobile .hero-bg-circle { display: none; }
+
+  /* Small login pill, top-right */
+  html.is-mobile .login-status {
+    display: flex;
+    position: absolute;
+    top: 24px;
+    right: 16px;
+    left: auto;
+    z-index: 5;
+  }
+  html.is-mobile .top_right-login-btn { width: auto; padding: 6px 20px; font-size: 13px; }
+  html.is-mobile #user-id { font-size: 10px; }
+
+  /* Unwrap .hero__left so its children can be reordered around the video */
+  html.is-mobile .hero__left { display: contents; }
+  html.is-mobile .hero__top-group { order: 1; width: 100%; max-width: 230px; }
+  html.is-mobile .hero__middle-group { display: none; }
+  html.is-mobile .hero__lower-group {
+    order: 3;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: -20px 0 24px;
+  }
+
+  html.is-mobile .hero__right { order: 2; align-self: center; width: 100%; margin-top: 8px; }
+  html.is-mobile .hero__video {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  html.is-mobile .login-cta {
+    position: relative;
+    width: min(355px, calc(100vw - 32px));
+    z-index: 5;
+  }
+  html.is-mobile .login-img { width: 100%; margin: 0; }
+
+  /* Machine type nav */
+  html.is-mobile .machine-nav {
+    background: linear-gradient(to bottom, #C0D7FA 0%, #D4E4F3 100%);
+    border-radius: 20px 20px 0 0;
+    margin: 0 16px;
+  }
+  html.is-mobile .machine-nav__inner {
+    max-width: 480px;
+    padding: 16px 16px 0;
+  }
+  html.is-mobile .machine-nav__header { margin-bottom: 4px; }
+  html.is-mobile .machine-nav__title { font-size: 21px; }
+  html.is-mobile .machine-nav__sub { display: none; }
+
+  html.is-mobile .machine-tabs-bar {
+    background: linear-gradient(to bottom, #D4E4F3 0%, rgba(212, 228, 243, 0.9) 70%, rgba(232, 240, 236, 0) 100%);
+    margin: 0 16px;
+  }
+  html.is-mobile .machine-tabs-bar__inner {
+    max-width: 480px;
+    padding: 12px 16px 24px;
+  }
+  html.is-mobile .machine-tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 12px;
+    padding-bottom: 2px;
+  }
+  html.is-mobile .machine-tabs::-webkit-scrollbar { display: none; }
+  html.is-mobile .tab-selector { display: none; }
+
+  html.is-mobile .machine-tab {
+    flex: 0 0 auto;
+    width: 79px;
+    padding: 8px 6px 8px;
+    border-radius: 15px;
+    gap: 6px;
+  }
+  html.is-mobile .machine-tab.is-active { background: #6BB3FF; }
+
+  html.is-mobile .machine-tab__img-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 58px;
+  }
+  html.is-mobile .machine-tab__img-wrap img { object-fit: contain; }
+  html.is-mobile .machine-tab[data-target="printer"] .machine-tab__img-wrap img { width: 62px; height: 47px; }
+  html.is-mobile .machine-tab[data-target="laser"]   .machine-tab__img-wrap img { width: 72px; height: 37px; }
+  html.is-mobile .machine-tab[data-target="uv"]      .machine-tab__img-wrap img { width: 68px; height: 36px; }
+  html.is-mobile .machine-tab[data-target="scanner"] .machine-tab__img-wrap img { width: 41px; height: 45px; }
+  html.is-mobile .machine-tab span {
+    width: 100%;
+    height: auto;
+    font-size: 10px;
+    color: #273944;
+  }
+  html.is-mobile .machine-tab.is-active span { color: #F5F8F9; }
+
+  /* Machine list & cards */
+  html.is-mobile .machine-list {
+    max-width: 480px;
+    padding: 32px 16px 140px;
+  }
+  html.is-mobile .machine-section { margin-bottom: 32px; }
+  html.is-mobile .machine-section__icon { height: 44px; }
+  html.is-mobile .machine-section__name { font-size: 21px; }
+  html.is-mobile .machine-section__desc { display: none; }
+  html.is-mobile .badge-training { font-size: 10px; padding: 3px 12px; }
+
+  html.is-mobile .machine-cards--two,
+  html.is-mobile .machine-cards--one { gap: 24px; }
+
+  html.is-mobile .machine-card__mascot { display: none; }
+
+  html.is-mobile .machine-card { background: #9ECDFF; border-radius: 23px; }
+
+  /* Info bar is always visible on touch (the desktop hover state, made default) */
+  html.is-mobile .machine-card__photo-wrap {
+    top: clamp(3px, 1.4vw, 6px);
+    left: clamp(3px, 1.4vw, 6px);
+    right: clamp(3px, 1.4vw, 6px);
+    bottom: 36%;
+    border-radius: clamp(16px, 5vw, 20px);
+  }
+  html.is-mobile .machine-card__info { transform: translateY(0); }
+
+  html.is-mobile .machine-card__name-bar {
+    background: #9ECDFF;
+    color: #273944;
+    border-radius: 21px 21px 0 0;
+    padding: 8px 13px;
+    font-size: 18px;
+  }
+  html.is-mobile .machine-card__detail-bar {
+    background: #9ECDFF;
+    height: auto;
+    min-height: 52px;
+    padding: 4px 15px;
+    border-radius: 0 0 21px 21px;
+  }
+  html.is-mobile .mtag {
+    background: #E5F2FF;
+    color: #273944;
+    font-size: 10px;
+    padding: 3px 9px;
+  }
+  html.is-mobile .machine-card__price { color: #273944; }
+  html.is-mobile .price-val  { font-size: 25px; }
+  html.is-mobile .price-unit { font-size: 10px; }
 }
 
-/* â”€â”€ Training overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Training overlay */
 .training-overlay {
   position: fixed;
   inset: 0;
@@ -930,12 +1082,10 @@ button {
   .training-card__block:last-child { margin-top: 0; }
 }
 
-/* ================================================
+/* ============================================================
    MACHINE DETAIL POPUP
-   Figma: "Machine Details" (node 3352:15927).
-   --u = 1px of the 497px-wide design frame, so every
-   dimension below is the raw Figma value * var(--u).
-================================================ */
+   --u = 1px of the 497px-wide Figma frame
+============================================================ */
 
 .mpop-overlay {
   --mpop-pad-top: clamp(16px, 2vh, 40px);
@@ -1009,12 +1159,13 @@ button {
   -webkit-backdrop-filter: blur(calc(1.77 * var(--u)));
   border-radius: 900px;
 }
+.mpop-tabs[hidden] { display: none; }
 
 .mpop-tab-indicator {
   position: absolute;
   top: calc(2.48 * var(--u));
   height: calc(26.61 * var(--u));
-  background: #6fa9e4;
+  background: #6bb3ff;
   border-radius: 900px;
   pointer-events: none;
   transition: left 0.38s cubic-bezier(0.59, -0.33, 0.36, 1.26),
@@ -1053,6 +1204,7 @@ button {
   background: none;
   cursor: pointer;
   flex-shrink: 0;
+  margin-left: auto; /* stays right even when the tabs pill is hidden */
   transition: transform 0.35s cubic-bezier(0.59, -0.33, 0.36, 1.26);
 }
 
@@ -1076,7 +1228,7 @@ button {
   position: absolute;
   top: calc(42.57 * var(--u));
   left: 0;
-  width: calc(35.47 * var(--u));
+  width: calc(37.99 * var(--u));
   display: flex;
   flex-direction: column;
   /* right edges stay glued to the card while hovered buttons grow leftward */
@@ -1089,16 +1241,17 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: calc(1.42 * var(--u));
-  width: calc(35.47 * var(--u));
-  height: calc(57.11 * var(--u));
-  margin-bottom: calc(-9.22 * var(--u));
+  gap: calc(1.52 * var(--u));
+  width: calc(37.99 * var(--u));
+  height: calc(61.16 * var(--u));
+  margin-bottom: calc(-9.88 * var(--u));
   border: none;
-  border-radius: calc(10.64 * var(--u)) 0 0 calc(23.06 * var(--u));
+  border-radius: calc(11.4 * var(--u)) 0 0 calc(24.69 * var(--u));
   cursor: pointer;
   padding: 0;
   font-family: 'Poppins', sans-serif;
-  transition: width 0.32s cubic-bezier(0.59, -0.33, 0.36, 1.26),
+  will-change: width;
+  transition: width 0.38s cubic-bezier(0.59, -0.33, 0.36, 1.26),
               filter 0.2s;
 }
 
@@ -1110,36 +1263,36 @@ button {
 .mpop-side-btn:nth-child(3) { z-index: 2; }
 .mpop-side-btn:nth-child(4) { z-index: 1; }
 
-.mpop-side-btn:hover { width: calc(42.5 * var(--u)); filter: brightness(1.08); }
+.mpop-side-btn:hover { width: calc(60.79 * var(--u)); filter: brightness(1.08); }
 
-/* Tab whose section is currently in view stays extended, like a selected tab */
-.mpop-side-btn.is-active { width: calc(42.5 * var(--u)); }
+.mpop-side-btn.is-active { width: calc(60.79 * var(--u)); }
 
 .mpop-side-icon {
-  width: calc(14 * var(--u));
-  height: calc(15 * var(--u));
   object-fit: contain;
 }
 
+/* Icon SVGs are padded square canvases, so the box must be square too */
+.mpop-side-btn--about .mpop-side-icon { width: calc(20.9 * var(--u)); height: calc(20.9 * var(--u)); }
+.mpop-side-btn--price .mpop-side-icon { width: calc(23.55 * var(--u)); height: calc(23.55 * var(--u)); }
+.mpop-side-btn--hint  .mpop-side-icon { width: calc(21.65 * var(--u)); height: calc(21.65 * var(--u)); }
+.mpop-side-btn--faq   .mpop-side-icon { width: calc(17.48 * var(--u)); height: calc(17.48 * var(--u)); }
+
 .mpop-side-label {
-  font-size: calc(5.68 * var(--u));
+  font-size: calc(6.8 * var(--u));
   font-weight: 400;
-  color: #F2F5F8;
+  color: #FFFFFF;
   white-space: nowrap;
 }
 
-.mpop-side-btn--about { background: #0A86FF; }
+.mpop-side-btn--about { background: #3F96ED; }
 .mpop-side-btn--price { background: #F9D03D; }
-.mpop-side-btn--hint  { background: #F2685F; }
+.mpop-side-btn--hint  { background: #F05449; }
 .mpop-side-btn--faq   { background: #17DA99; }
 
-/* ---- Scroll viewport: covers the whole wrap so the card can slide up
-   behind the topbar/sidebar (which sit above it on z-index). Topbar,
-   sidebar and book-now all live outside this element, so they never move. ---- */
+/* ---- Scroll viewport ---- */
 .mpop-scrollport {
   position: absolute;
-  /* reach above the wrap (through the overlay's top padding) so the
-     scrolled card clips at the viewport top, not at the wrap top */
+  /* extends above the wrap so the card clips at the viewport top */
   top: calc(-1 * var(--mpop-pad-top));
   left: 0;
   right: 0;
@@ -1153,13 +1306,10 @@ button {
 
 .mpop-scrollport::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
-/* ---- Main card (design "Body") — natural height, grows past the
-   viewport so scrolling moves the whole card, not just its contents ---- */
+/* ---- Main card ---- */
 .mpop-card {
-  /* offsets replace the old scrollport inset so the card starts below the
-     topbar / right of the sidebar, but can still scroll up past them */
   margin-top: calc(42.57 * var(--u) + var(--mpop-pad-top));
-  margin-left: calc(35.47 * var(--u));
+  margin-left: calc(37.99 * var(--u));
   min-height: calc(100% - 42.57 * var(--u) - var(--mpop-pad-top));
   background: #E8EEF0;
   border-radius: 0 calc(70.95 * var(--u)) 0 0;
@@ -1813,7 +1963,7 @@ button {
   position: relative;
   z-index: 1;
   display: block;
-  width: calc(75.56 * var(--u));  /* Figma 213x138, x0.3547 */
+  width: calc(75.56 * var(--u));
   height: calc(48.95 * var(--u));
   padding: 0;
   background: none;
@@ -1824,7 +1974,7 @@ button {
 }
 
 .mpop-booknow.is-login {
-  width: calc(98.26 * var(--u));  /* Figma 277x139 */
+  width: calc(98.26 * var(--u));
   height: calc(49.31 * var(--u));
 }
 
@@ -1864,11 +2014,11 @@ button {
 }
 
 @keyframes bn-blink {
-  0%   { transform: scaleY(1); opacity: 1; }      /* open cylinder */
-  40%  { transform: scaleY(0.36); opacity: 1; }    /* shortens top-to-bottom into a circle */
-  60%  { transform: scaleY(0.05); opacity: 0; }    /* collapses and disappears */
-  78%  { transform: scaleY(0.05); opacity: 0; }    /* closed */
-  100% { transform: scaleY(1); opacity: 1; }       /* reopens */
+  0%   { transform: scaleY(1); opacity: 1; }
+  40%  { transform: scaleY(0.36); opacity: 1; }
+  60%  { transform: scaleY(0.05); opacity: 0; }
+  78%  { transform: scaleY(0.05); opacity: 0; }
+  100% { transform: scaleY(1); opacity: 1; }
 }
 
 @keyframes booknow-enter {
@@ -1888,15 +2038,364 @@ button {
   transition: transform 0.2s ease, opacity 0.18s ease;
 }
 
-/* ---- Responsive ---- */
+/* ---- Responsive (desktop only) ---- */
 @media (max-width: 760px) {
-  .mpop-wrap { --u: 1.35px; width: 100%; }
-  .mpop-hero { flex-direction: column; }
-  .mpop-pic { width: 100%; }
-  .mpop-features-grid { grid-template-columns: 1fr; }
-  .mpop-feature-card { height: auto; min-height: calc(119.55 * var(--u)); }
-  .mpop-samples-row { flex-wrap: wrap; justify-content: center; }
-  .mpop-reminder-row, .mpop-prepare-row { flex-direction: column; }
-  .mpop-sidebar { display: none; }
-  .mpop-card { margin-left: 0; border-radius: calc(10.64 * var(--u)) calc(40 * var(--u)) 0 0; }
+  html.is-desktop .mpop-wrap { --u: 1.35px; width: 100%; }
+  html.is-desktop .mpop-hero { flex-direction: column; }
+  html.is-desktop .mpop-pic { width: 100%; }
+  html.is-desktop .mpop-features-grid { grid-template-columns: 1fr; }
+  html.is-desktop .mpop-feature-card { height: auto; min-height: calc(119.55 * var(--u)); }
+  html.is-desktop .mpop-samples-row { flex-wrap: wrap; justify-content: center; }
+  html.is-desktop .mpop-reminder-row, html.is-desktop .mpop-prepare-row { flex-direction: column; }
+  html.is-desktop .mpop-sidebar { display: none; }
+  html.is-desktop .mpop-card { margin-left: 0; border-radius: calc(10.64 * var(--u)) calc(40 * var(--u)) 0 0; }
+}
+
+/* ============================================================
+   MOBILE MACHINE POPUP
+============================================================ */
+.mpopm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  background: rgba(20, 34, 43, 0.75);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+.mpopm-overlay.is-open { opacity: 1; pointer-events: auto; }
+
+.mpopm-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  max-height: 92dvh;
+  background: #E8EEF0;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0px -1px 14px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.mpopm-overlay.is-open .mpopm-sheet { transform: translateY(0); }
+.mpopm-overlay.is-closing .mpopm-sheet { transform: translateY(100%); }
+
+.mpopm-handle {
+  position: absolute;
+  top: 13px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 37px;
+  height: 4px;
+  padding: 12px 30px; /* generous touch target around the thin visual bar */
+  margin: -12px -30px;
+  background: transparent;
+  border: none;
+  z-index: 2;
+  touch-action: none;
+  cursor: grab;
+}
+.mpopm-handle::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 30px;
+  width: 37px;
+  height: 4px;
+  border-radius: 19px;
+  background: #4D7187;
+  opacity: 0.5;
+}
+
+.mpopm-close {
+  position: absolute;
+  top: 13px;
+  right: 21px;
+  width: 41px;
+  height: 41px;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+.mpopm-close:active { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25); }
+.mpopm-close img { width: 100%; height: 100%; display: block; }
+
+.mpopm-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  padding-top: 37px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mpopm-toplabel {
+  margin: 0 0 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.2;
+  color: #7399AF;
+}
+
+.mpopm-info { display: flex; flex-direction: column; gap: 16px; margin-bottom: 18px; }
+.mpopm-info-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.mpopm-title-tag { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.mpopm-title {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.2;
+  color: #273944;
+}
+.mpopm-chips { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.mpopm-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #F5F8F9;
+  white-space: nowrap;
+}
+.mpopm-chip--red  { background: #F2685F; }
+.mpopm-chip--blue { background: #6BB3FF; }
+
+.mpopm-price {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  height: 36px;
+  padding: 0 14px;
+  background: #0A86FF;
+  border-radius: 99px;
+  color: #F5F8F9;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+}
+.mpopm-price .val { font-size: 18px; }
+.mpopm-price .unit { font-size: 12px; font-weight: 400; }
+
+.mpopm-photo {
+  width: 100%;
+  height: 195px;
+  border-radius: 11px;
+  overflow: hidden;
+}
+.mpopm-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.mpopm-specs { display: flex; flex-direction: column; margin-bottom: 18px; }
+.mpopm-spec-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(77, 113, 135, 0.18);
+}
+.mpopm-spec-row:last-child { border-bottom: none; }
+.mpopm-spec-icon { width: 32px; height: 32px; flex-shrink: 0; }
+.mpopm-spec-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mpopm-spec-label { margin: 0; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 15px; color: #273944; }
+.mpopm-spec-val   { margin: 0; font-family: 'Poppins', sans-serif; font-size: 15px; line-height: 1.4; color: #4D7187; }
+
+.mpopm-block { margin-bottom: 18px; }
+.mpopm-h {
+  margin: 0 0 12px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.2;
+  color: #273944;
+}
+
+.mpopm-features { display: flex; flex-direction: column; gap: 8px; }
+.mpopm-feature-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 197px;
+  padding: 20px 24px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.mpopm-feature-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.mpopm-feature-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(232,238,240,0.94) 0%, rgba(232,238,240,0.75) 55%, rgba(232,238,240,0.35) 100%);
+}
+.mpopm-feature-icon { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
+.mpopm-feature-text { position: relative; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mpopm-feature-title { margin: 0; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 18px; line-height: 1.2; color: #273944; }
+.mpopm-feature-title .sub { display: block; }
+.mpopm-feature-desc  { margin: 0; font-family: 'Poppins', sans-serif; font-size: 15px; line-height: 1.4; color: #4D7187; }
+
+.mpopm-reminders { display: flex; flex-direction: column; gap: 8px; }
+.mpopm-reminder-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: #F5F8F9;
+  border-radius: 24px;
+}
+.mpopm-reminder-icon { width: 56px; height: 56px; flex-shrink: 0; }
+.mpopm-reminder-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mpopm-reminder-title { margin: 0; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 18px; line-height: 1.2; color: #273944; }
+.mpopm-reminder-desc  { margin: 0; font-family: 'Poppins', sans-serif; font-size: 15px; line-height: 1.4; color: #4D7187; }
+
+.mpopm-faq-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.mpopm-whatsapp {
+  height: 30px;
+  padding: 5px 14px;
+  background: #9ECDFF;
+  border: none;
+  border-radius: 33px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  color: #F2F5F8;
+  cursor: pointer;
+}
+.mpopm-whatsapp:active { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25); }
+.mpopm-faq-list { display: flex; flex-direction: column; gap: 8px; }
+.mpopm-faq-item { padding: 16px; background: #F5F8F9; border-radius: 11px; }
+.mpopm-faq-q {
+  margin: 0 0 8px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #273944;
+}
+.mpopm-faq-a {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #4D7187;
+}
+
+.mpopm-cta-spacer { height: 90px; } /* keeps FAQ content clear of the sticky CTA */
+
+/* Corner decoration overflows above the pill; don't clip .mpopm-sheet */
+.mpopm-cta {
+  position: absolute;
+  left: 23px;
+  right: 23px;
+  bottom: 24px;
+  height: 67px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  background: #0A86FF;
+  border: none;
+  border-radius: 40px;
+  box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.mpopm-cta:active { background: #0055A8; }
+.mpopm-cta-corner {
+  position: absolute;
+  top: -24px;
+  right: -2px;
+  width: 53px;
+  height: 81px;
+  pointer-events: none;
+}
+.mpopm-cta-corner-flag { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mpopm-cta-corner-star {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  width: 22px;
+  height: 26px;
+  transform: rotate(-13deg);
+}
+.mpopm-cta-badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(245, 248, 249, 0.25);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #F5F8F9;
+}
+.mpopm-cta-label {
+  flex: 1;
+  text-align: left;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 19px;
+  color: #F5F8F9;
+}
+.mpopm-cta-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 41px;
+  height: 41px;
+}
+.mpopm-cta-icon-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mpopm-cta-icon-chevron {
+  position: absolute;
+  top: 11px;
+  left: 14px;
+  width: 12px;
+  height: 20px;
+}
+
+@media (min-width: 480px) {
+  .mpopm-sheet { border-radius: 24px; margin-bottom: 24px; }
+}
+
+/* ============================================================
+   MOBILE PAGE CTA
+============================================================ */
+.mlist-cta-fade,
+.mlist-cta { display: none; }
+
+html.is-mobile .mlist-cta-fade {
+  display: block;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 153px;
+  background: linear-gradient(to bottom, rgba(232, 238, 240, 0) 0%, #E8EEF0 65%);
+  pointer-events: none;
+  z-index: 59;
+}
+
+html.is-mobile .mlist-cta {
+  display: flex;
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 24px;
+  max-width: 448px;
+  margin: 0 auto;
+  z-index: 60;
 }
