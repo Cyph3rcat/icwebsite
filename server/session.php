@@ -1,7 +1,7 @@
 <?php
 // Login status for the new front end. Deploy to iemakerlab/booking/api/session.php.
 //
-// Logged in:  200 {"logged_in": true, "user_id": "...", "user_email": "..."}
+// Logged in:  200 {"logged_in": true, "user_id": "..."}  (the email stays in the PHP session only)
 // Logged out: 200 {"logged_in": false}  (or 401 from authorization.php if the token cookie is gone)
 //
 // authentication.php also stores user_email in the PHP session, which MyBooking.php
@@ -26,6 +26,5 @@ ob_end_clean();
 
 echo json_encode([
     'logged_in'  => true,
-    'user_id'    => $user_id,
-    'user_email' => $user_email,
+    'user_id'   => $user_id,
 ]);

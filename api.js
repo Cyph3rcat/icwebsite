@@ -1,10 +1,11 @@
 // Client for the IE Maker Lab PHP backend (iemakerlab/booking). Off the PolyU host,
-// or with ?mock in the URL, it uses an in-browser mock with the same response shapes.
+// it uses an in-browser mock with the same response shapes.
 const BOOKING_ROOT = '/ic/iemakerlab/booking';
 const API_ROOT = `${BOOKING_ROOT}/api`;
 
-export const USE_MOCK =
-  !location.hostname.endsWith('polyu.edu.hk') || new URLSearchParams(location.search).has('mock');
+const ON_POLYU = location.hostname.endsWith('polyu.edu.hk');
+// The mock is only used off the PolyU host, so a crafted ?mock link can't fake bookings for a real user
+export const USE_MOCK = !ON_POLYU;
 
 export class ApiError extends Error {
   constructor(message, status = 0) {

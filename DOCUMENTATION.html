@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IE Maker Lab Code Guide</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --fg:#14181f; --muted:#5a6472; --line:#dde1e7;
+  --accent:#b3122f; --accent-soft:#fbe9ec;
+  --code-bg:#10141b; --code-fg:#d7dde8; --code-dim:#7d8799;
+  --hl-bg:rgba(255,196,46,.16); --hl-bar:#ffc42e;
+  --net:#2fb67c; --net-soft:#e3f6ee;
+  --hi:#c8102e; --med:#c77700; --low:#4a6fa5;
+  --hi-soft:#fde8ec; --med-soft:#fff1dc; --low-soft:#e8eff8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1116; --panel:#161b23; --fg:#e6e9ee; --muted:#9aa3b2; --line:#2a313c;
+    --accent:#ff5c77; --accent-soft:#2a1519;
+    --code-bg:#0a0d12; --code-fg:#d7dde8; --code-dim:#6f7a8d;
+    --hl-bg:rgba(255,196,46,.14); --hl-bar:#ffc42e;
+    --net:#3fd496; --net-soft:#12261e;
+    --hi:#ff6b82; --med:#ffb04a; --low:#7fa8dc;
+    --hi-soft:#2b1519; --med-soft:#2b2010; --low-soft:#14202f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --panel:#161b23; --fg:#e6e9ee; --muted:#9aa3b2; --line:#2a313c;
+  --accent:#ff5c77; --accent-soft:#2a1519;
+  --code-bg:#0a0d12; --code-fg:#d7dde8; --code-dim:#6f7a8d;
+  --hl-bg:rgba(255,196,46,.14); --hl-bar:#ffc42e;
+  --net:#3fd496; --net-soft:#12261e;
+  --hi:#ff6b82; --med:#ffb04a; --low:#7fa8dc;
+  --hi-soft:#2b1519; --med-soft:#2b2010; --low-soft:#14202f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  padding-block:0 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px}
+nav.toc{position:sticky;top:24px;align-self:start;padding-top:56px;font-size:14px;max-height:100vh;overflow:auto}
+nav.toc b{display:block;font:600 11px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+nav.toc a{display:block;padding:5px 0 5px 12px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none}
+nav.toc a:hover{color:var(--fg);border-color:var(--accent)}
+main{min-width:0;padding-top:56px}
+h1{font:700 clamp(30px,5vw,44px)/1.1 "Space Grotesk","Inter",system-ui,sans-serif;margin:0 0 12px;letter-spacing:-.02em;text-wrap:balance}
+h2{font:700 28px/1.2 "Space Grotesk","Inter",system-ui,sans-serif;margin:72px 0 8px;letter-spacing:-.01em;text-wrap:balance;scroll-margin-top:16px}
+h3{font:600 19px/1.3 "Space Grotesk","Inter",system-ui,sans-serif;margin:40px 0 6px;scroll-margin-top:16px}
+h3 code,h2 code{font-size:.85em}
+p{margin:10px 0;max-width:70ch}
+.lede{font-size:18px;color:var(--muted);max-width:62ch}
+a{color:var(--accent)}
+code{font-family:"DM Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.88em;background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:4px}
+.eyebrow{font:500 12px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+ul,ol{max-width:70ch;padding-left:22px}
+li{margin:4px 0}
+
+.legend{display:flex;flex-wrap:wrap;gap:12px 24px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:24px 0;font-size:14px}
+.legend div{display:flex;align-items:center;gap:8px}
+.sw{display:inline-block;width:26px;height:14px;border-radius:3px}
+.sw.hl{background:var(--hl-bg);border-left:3px solid var(--hl-bar)}
+.tag{display:inline-block;font:600 11px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.06em;padding:4px 7px;border-radius:4px;vertical-align:middle;white-space:nowrap}
+.tag.net{background:var(--net-soft);color:var(--net);border:1px solid var(--net)}
+.tag.hi{background:var(--hi-soft);color:var(--hi)}
+.tag.med{background:var(--med-soft);color:var(--med)}
+.tag.low{background:var(--low-soft);color:var(--low)}
+.tag.file{background:var(--line);color:var(--muted)}
+
+/* code */
+.codewrap{margin:14px 0 6px;border-radius:10px;overflow:hidden;background:var(--code-bg);border:1px solid var(--line)}
+.codehead{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;font:12px/1.4 "DM Mono",ui-monospace,monospace;color:var(--code-dim);border-bottom:1px solid rgba(255,255,255,.08)}
+pre{margin:0;padding:10px 0;overflow-x:auto;white-space:normal;font:13px/1.65 "DM Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;color:var(--code-fg);tab-size:2}
+pre .ln{display:block;white-space:pre;padding:0 16px 0 13px;border-left:3px solid transparent;min-width:max-content}
+pre .hl{background:var(--hl-bg);border-left-color:var(--hl-bar)}
+pre .net{background:rgba(63,212,150,.13);border-left-color:var(--net)}
+pre .c{color:var(--code-dim)}
+pre .k{color:#e58aa0}
+pre .s{color:#9bd3a2}
+pre .n{color:#f0b866}
+pre .note{color:var(--net);font-style:normal;font-weight:600;margin-left:14px}
+pre .note.y{color:var(--hl-bar)}
+
+.explain{margin:6px 0 18px;padding:12px 16px;background:var(--panel);border:1px solid var(--line);border-radius:8px;max-width:76ch}
+.explain p{margin:4px 0}
+.explain ul{margin:4px 0}
+
+/* tables */
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px/1.2 "DM Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td code{white-space:nowrap}
+
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;position:relative}
+.box h4{margin:0 0 4px;font:600 16px/1.3 "Space Grotesk",system-ui,sans-serif}
+.box small{display:block;color:var(--muted);font:12px/1.5 "DM Mono",ui-monospace,monospace;margin-bottom:8px}
+.box p{font-size:14px;margin:6px 0}
+.box.server{border-color:var(--net)}
+.arrowrow{display:flex;gap:10px;align-items:center;color:var(--muted);font:12px/1.4 "DM Mono",ui-monospace,monospace;margin:-4px 0 10px;flex-wrap:wrap}
+
+.steps{counter-reset:s;list-style:none;padding:0;max-width:78ch}
+.steps li{counter-increment:s;position:relative;padding:12px 14px 12px 52px;margin:8px 0;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.steps li::before{content:counter(s);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font:600 13px/1 "DM Mono",monospace}
+.steps li.srv{border-color:var(--net)}
+
+.finding{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--low);border-radius:8px;padding:16px 18px;margin:16px 0;max-width:80ch}
+.finding.hi{border-left-color:var(--hi)}.finding.med{border-left-color:var(--med)}
+.finding h4{margin:0 0 6px;font:600 17px/1.3 "Space Grotesk",system-ui,sans-serif;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.finding p{margin:6px 0;font-size:15px}
+.finding .fix{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.good li{color:var(--fg)}
+dl{max-width:72ch}dt{font-weight:600;margin-top:12px}dd{margin:2px 0 0;color:var(--muted)}
+.callout{background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:12px 16px;max-width:76ch;margin:16px 0}
+footer{margin-top:80px;color:var(--muted);font-size:13px}
+
+@media (max-width:860px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{position:static;padding-top:32px;max-height:none;display:flex;flex-wrap:wrap;gap:6px 12px}
+  nav.toc b{width:100%;margin-bottom:4px}
+  nav.toc a{border-left:0;padding:2px 0}
+  main{padding-top:24px}
+  .flow{grid-template-columns:minmax(0,1fr)}
+}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc" aria-label="Sections">
+  <b>Contents</b>
+  <a href="#big-picture">1 Big picture</a>
+  <a href="#reading">2 Reading the code</a>
+  <a href="#server-map">3 Every server call</a>
+  <a href="#apijs">4 api.js</a>
+  <a href="#mainjs">5 main.js</a>
+  <a href="#bookingjs">6 booking.js</a>
+  <a href="#php">7 The PHP backend</a>
+  <a href="#journey">8 One booking, start to end</a>
+  <a href="#security">9 Security</a>
+  <a href="#glossary">10 Glossary</a>
+</nav>
+
+<main>
+<p class="eyebrow">IE Maker Lab booking site</p>
+<h1>Code guide</h1>
+<p class="lede">What each file and function does, which lines matter, and exactly where the code talks to the PolyU server. Written for someone who doesn't read code yet.</p>
+
+<div class="legend" aria-label="Legend">
+  <div><span class="sw hl"></span> Highlighted line: an important line</div>
+  <div><span class="tag net">SERVER</span> This line contacts the server</div>
+  <div><span class="tag hi">HIGH</span> <span class="tag med">MEDIUM</span> <span class="tag low">LOW</span> Security severity</div>
+</div>
+
+<!-- ============ 1 ============ -->
+<h2 id="big-picture">1 · The big picture</h2>
+<p>There are three layers. The browser shows the page. The PHP scripts on the PolyU server decide what's allowed. The database remembers everything.</p>
+
+<div class="flow">
+  <div class="box">
+    <h4>Front end</h4>
+    <small>runs in the visitor's browser</small>
+    <p>This repo. <code>index.html</code> is the page, <code>main.js</code> and <code>booking.js</code> make it interactive, <code>api.js</code> is the only file that sends requests out.</p>
+  </div>
+  <div class="box server">
+    <h4>PHP backend</h4>
+    <small>runs on www.polyu.edu.hk</small>
+    <p>Folder <code>iemakerlab/</code> (not in git). Checks who you are, applies the booking rules, reads and writes the database, sends emails.</p>
+  </div>
+  <div class="box server">
+    <h4>MySQL database</h4>
+    <small>separate server, 158.132.152.154</small>
+    <p>Database <code>iciemakerlab_external</code>. Tables hold bookings, timeslots, printers and training records.</p>
+  </div>
+</div>
+<div class="arrowrow">Browser → <code>fetch()</code> over HTTPS with a login cookie → PHP → SQL → MySQL, and the answer travels back as JSON.</div>
+
+<p><b>The rule that explains the design:</b> the browser is untrusted. Anyone can open DevTools and change any JavaScript. So the JavaScript only draws the screen and asks nicely. The PHP re-checks everything (are you logged in, are you trained, is the slot free). Keep that in mind when you read the security section.</p>
+
+<h3>Files in this repo</h3>
+<div class="tablewrap"><table>
+<tr><th>File</th><th>Lines</th><th>What it is</th></tr>
+<tr><td><code>index.html</code></td><td>1445</td><td>All the page markup. Desktop and phone versions of each popup are both in here; JavaScript shows the right one.</td></tr>
+<tr><td><code>style.css</code></td><td>2401</td><td>Styles for the main page and machine popups.</td></tr>
+<tr><td><code>booking.css</code></td><td>2141</td><td>Styles for the booking flow and tickets.</td></tr>
+<tr><td><code>main.js</code></td><td>1154</td><td>Login button, machine cards, machine detail popups, training badges.</td></tr>
+<tr><td><code>booking.js</code></td><td>1047</td><td>Pick date and sessions, confirm, ticket, cancel. Desktop and phone.</td></tr>
+<tr><td><code>api.js</code></td><td>252</td><td>The bridge to the server, plus a fake server for testing.</td></tr>
+<tr><td><code>server/session.php</code></td><td>31</td><td>New PHP file you add to the backend. Tells the front end "who is logged in".</td></tr>
+</table></div>
+
+<!-- ============ 2 ============ -->
+<h2 id="reading">2 · How to read this code</h2>
+<dl>
+<dt>Function</dt><dd>A named block of steps. <code>function bkToday() { ... }</code> defines it; <code>bkToday()</code> runs it.</dd>
+<dt><code>const</code> / <code>let</code></dt><dd>A named box that holds a value. <code>const</code> never gets reassigned, <code>let</code> can be.</dd>
+<dt><code>async</code> / <code>await</code></dt><dd>Network calls take time. <code>await</code> means "pause here until the server answers", and only works inside an <code>async function</code>. When you see <code>await</code> on a line, that line is waiting for something slow, usually the server.</dd>
+<dt><code>try { } catch (err) { }</code></dt><dd>Try the risky steps. If any throws an error, jump to <code>catch</code> and handle it instead of crashing. Almost every server call is wrapped like this.</dd>
+<dt><code>import</code> / <code>export</code></dt><dd>How files share functions. <code>main.js</code> imports from <code>api.js</code>, so it can call <code>getSession()</code>.</dd>
+<dt>Naming prefixes in booking.js</dt><dd><code>bk…</code> desktop booking, <code>bkp…</code> phone booking, <code>tk…</code> ticket popup. In main.js, <code>mpop…</code> is the desktop machine popup and <code>mpopm…</code> the phone one.</dd>
+</dl>
+
+<!-- ============ 3 ============ -->
+<h2 id="server-map">3 · Every place the server is contacted</h2>
+<p>There are only <b>six</b> functions in the whole front end that touch the network, all in <code>api.js</code>. Everything else calls these. If you need to find "where does it talk to the server", this table is the full answer.</p>
+
+<div class="tablewrap"><table>
+<tr><th>Front-end function (api.js)</th><th>Called from</th><th>HTTP request</th><th>PHP file that answers</th><th>Database table touched</th></tr>
+<tr><td><code>getSession()</code></td><td>main.js <code>startSession</code> (line 183)</td><td><code>GET api/session.php</code></td><td><code>session.php</code> (new)</td><td>none (reads the PHP session and login token)</td></tr>
+<tr><td><code>login()</code></td><td>main.js <code>doLogin</code></td><td>Browser navigates to <code>booking/</code> (full page redirect to PolyU SSO)</td><td><code>polyusso/*</code></td><td>none</td></tr>
+<tr><td><code>logout()</code></td><td>main.js logout click</td><td>Browser navigates to <code>booking/logout/</code></td><td><code>logout/</code></td><td>none</td></tr>
+<tr><td><code>getAvailability()</code></td><td>booking.js line 133 <code>bkLoadAvailability</code>; also <code>getTrainingStatus</code></td><td><code>GET api/3Dprinter/printerStatus.php</code></td><td><code>printerStatus.php</code></td><td><code>3d_print_training_record</code>, <code>3d_print_timeslot</code>, <code>3d_printer_booking_quantity</code>, <code>3d_print_booking_record</code></td></tr>
+<tr><td><code>listBookings()</code></td><td>booking.js line 352 <code>bkRefreshBookings</code></td><td><code>GET api/3Dprinter/MyBooking.php</code></td><td><code>MyBooking.php</code> (GET branch)</td><td><code>3d_print_booking_record</code></td></tr>
+<tr><td><code>createBookings()</code></td><td>booking.js line 373 <code>bkSubmitSelection</code>; phone <code>bkpSubmitBooking</code></td><td><code>POST api/3Dprinter/MyBooking.php</code></td><td><code>MyBooking.php</code> (POST branch)</td><td>reads training, timeslots, bookings; <b>inserts</b> into <code>3d_print_booking_record</code>; sends email</td></tr>
+<tr><td><code>cancelBooking()</code></td><td>booking.js lines 622, 903 <code>tkConfirmCancel</code>, <code>bkpConfirmCancel</code></td><td><code>DELETE api/3Dprinter/MyBooking.php</code></td><td><code>MyBooking.php</code> (DELETE branch)</td><td><b>updates</b> <code>3d_print_booking_record</code> (status → 2); sends email</td></tr>
+</table></div>
+<p>Training badges have no endpoint of their own. <code>getTrainingStatus()</code> calls <code>printerStatus.php</code> and treats a <code>401 "Not Trained User"</code> reply as "not trained".</p>
+
+<!-- ============ 4 ============ -->
+<h2 id="apijs">4 · <code>api.js</code>, the bridge</h2>
+<p>Every other file calls these functions and never writes <code>fetch</code> itself. That keeps the server details in one place. The file has two halves: the real client, and a mock (fake) server used when you test off the PolyU domain.</p>
+
+<h3>The switch between real and fake</h3>
+<div class="codewrap"><div class="codehead"><span>api.js</span><span>top of file</span></div><pre><span class="ln"><span class="k">const</span> BOOKING_ROOT = <span class="s">'/ic/iemakerlab/booking'</span>;</span><span class="ln"><span class="k">const</span> API_ROOT = <span class="s">`${BOOKING_ROOT}/api`</span>;</span><span class="ln hl"><span class="k">export const</span> USE_MOCK = !ON_POLYU;</span><span class="ln hl"><span class="note y">← the on/off switch</span></span></pre></div>
+<div class="explain"><p>If the page isn't on <code>polyu.edu.hk</code>, <code>USE_MOCK</code> is true and no network request is ever sent. That's why everything works on your laptop.</p></div>
+
+<h3><code>request(method, path, body)</code>, the one real network call</h3>
+<div class="codewrap"><div class="codehead"><span>api.js</span><span>function request</span></div><pre><span class="ln"><span class="k">async function</span> request(method, path, body) {</span><span class="ln net">  <span class="k">const</span> res = <span class="k">await</span> fetch(<span class="s">`${API_ROOT}/${path}`</span>, {<span class="note">← SERVER: every request goes through here</span></span><span class="ln">    method,</span><span class="ln hl">    credentials: <span class="s">'include'</span>,<span class="note y">← attach the login cookie</span></span><span class="ln">    cache: <span class="s">'no-store'</span>,</span><span class="ln">    headers: body ? { Accept: <span class="s">'application/json'</span>, <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> } : { Accept: <span class="s">'application/json'</span> },</span><span class="ln">    body: body ? JSON.stringify(body) : <span class="k">undefined</span>,</span><span class="ln">  });</span><span class="ln">  <span class="k">let</span> json = <span class="k">null</span>;</span><span class="ln">  <span class="k">try</span> { json = <span class="k">await</span> res.json(); } <span class="k">catch</span> { <span class="c">/* not JSON, e.g. an SSO login page */</span> }</span><span class="ln hl">  <span class="k">if</span> (!res.ok || !json) {</span><span class="ln hl">    <span class="k">throw new</span> ApiError(json?.Message || json?.message || <span class="s">`Request failed (${res.status})`</span>, res.status);</span><span class="ln hl">  }</span><span class="ln">  <span class="k">return</span> json;</span><span class="ln">}</span></pre></div>
+<div class="explain">
+<ul>
+<li><b><code>fetch(...)</code></b> is the browser's built-in "send an HTTP request". The URL becomes e.g. <code>/ic/iemakerlab/booking/api/3Dprinter/MyBooking.php</code>.</li>
+<li><b><code>credentials: 'include'</code></b> makes the browser attach the <code>access_token</code> cookie. That cookie is your proof of login. Without it the server answers 401.</li>
+<li>If the server replies with an error code, or something that isn't JSON, the function throws an <code>ApiError</code> carrying the server's <code>Message</code>. Later code shows that message in an <code>alert()</code>. That's how users see "session full" or "already booked".</li>
+</ul></div>
+
+<h3>The public functions</h3>
+<div class="codewrap"><div class="codehead"><span>api.js</span><span>exported functions (shortened)</span></div><pre><span class="ln"><span class="c">// Who is logged in?</span></span><span class="ln"><span class="k">export async function</span> getSession() {</span><span class="ln">  <span class="k">if</span> (USE_MOCK) <span class="k">return</span> mock.getSession();</span><span class="ln net">  <span class="k">const</span> json = <span class="k">await</span> request(<span class="s">'GET'</span>, <span class="s">'session.php'</span>);<span class="note">← SERVER</span></span><span class="ln">  <span class="k">return</span> { loggedIn: !!json.logged_in, userId: json.user_id || <span class="s">''</span> };</span><span class="ln">}</span><span class="ln"> </span><span class="ln"><span class="c">// Login = leave this page and go to PolyU SSO. The promise never finishes because the page is gone.</span></span><span class="ln"><span class="k">export function</span> login() {</span><span class="ln net">  location.href = <span class="s">`${BOOKING_ROOT}/`</span>;<span class="note">← SERVER (full page navigation)</span></span><span class="ln">  <span class="k">return new</span> Promise(() =&gt; {});</span><span class="ln">}</span><span class="ln"> </span><span class="ln"><span class="c">// Which dates and sessions can I book, and am I trained?</span></span><span class="ln"><span class="k">export async function</span> getAvailability() {</span><span class="ln net">  <span class="k">const</span> json = USE_MOCK ? mock.printerStatus() : <span class="k">await</span> request(<span class="s">'GET'</span>, <span class="s">'3Dprinter/printerStatus.php'</span>);<span class="note">← SERVER</span></span><span class="ln">  <span class="k">return</span> toAvailability(json);</span><span class="ln">}</span><span class="ln"> </span><span class="ln"><span class="k">export async function</span> listBookings() {</span><span class="ln net">  <span class="k">const</span> json = USE_MOCK ? mock.listBookings() : <span class="k">await</span> request(<span class="s">'GET'</span>, <span class="s">'3Dprinter/MyBooking.php'</span>);<span class="note">← SERVER</span></span><span class="ln">  <span class="k">return</span> (json[<span class="s">'Booking Record'</span>] || []).map(toBooking);</span><span class="ln">}</span><span class="ln"> </span><span class="ln"><span class="k">export async function</span> createBookings(items) {</span><span class="ln hl">  <span class="k">const</span> body = { <span class="s">'New Booking'</span>: items.map(i =&gt; ({</span><span class="ln hl">    service_date: i.date, service_timeslot_id: i.slotId, printer_type: i.printerType })) };</span><span class="ln net">  <span class="k">return</span> USE_MOCK ? mock.createBookings(body) : request(<span class="s">'POST'</span>, <span class="s">'3Dprinter/MyBooking.php'</span>, body);<span class="note">← SERVER writes a booking</span></span><span class="ln">}</span><span class="ln"> </span><span class="ln"><span class="k">export async function</span> cancelBooking(bookingId) {</span><span class="ln hl">  <span class="k">const</span> body = { <span class="s">'Delete Booking'</span>: [{ booking_id: bookingId }] };</span><span class="ln net">  <span class="k">return</span> USE_MOCK ? mock.cancelBookings(body) : request(<span class="s">'DELETE'</span>, <span class="s">'3Dprinter/MyBooking.php'</span>, body);<span class="note">← SERVER cancels</span></span><span class="ln">}</span></pre></div>
+<div class="explain">
+<p>The front end never sends who you are. It sends only <i>what</i> you want to book. The server works out who you are from the cookie. That's the right design, and it's why the security story is mostly good.</p>
+</div>
+
+<h3>The three small translators</h3>
+<dl>
+<dt><code>toBooking(row)</code></dt><dd>The server's field names are awkward (<code>service_timeslot_display</code>, <code>cancel_booking_allow</code>). This renames them to tidy ones (<code>label</code>, <code>canCancel</code>) so the rest of the code stays readable.</dd>
+<dt><code>toAvailability(json)</code></dt><dd>Same idea for <code>printerStatus.php</code>: turns <code>'Available Date'</code> and <code>'3D Printer'</code> into <code>{ dates, printers: [{ type, sessions }] }</code>. Each session has a <code>status</code> of <code>Available</code>, <code>Full</code> or <code>Unavailable</code>.</dd>
+<dt><code>getTrainingStatus()</code></dt><dd>Calls <code>getAvailability()</code> and sees whether it throws <code>"Not Trained User"</code>. Returns <code>{ printer: true }</code> or <code>{ printer: false }</code>.</dd>
+</dl>
+
+<h3>The mock server</h3>
+<p>The big <code>const mock = (() =&gt; { ... })()</code> block at the bottom pretends to be PHP. It stores a fake login and bookings in <code>localStorage</code> (the browser's small notepad), invents two printers and three daily sessions, and returns the same shapes the real server does. It also re-implements a few of the real rules (no double booking, session full, cancel cutoff) so the UI can be tested. <b>It is not used on the live site.</b></p>
+
+<!-- ============ 5 ============ -->
+<h2 id="mainjs">5 · <code>main.js</code>, the page and login</h2>
+<p>This file runs when the page loads. It wires up buttons, and decides what's shown depending on whether you're logged in.</p>
+
+<h3>Login and logout button <span class="tag file">main.js:50</span></h3>
+<div class="codewrap"><div class="codehead"><span>main.js</span><span>click handler</span></div><pre><span class="ln">document.getElementById(<span class="s">'login/out-btn'</span>).addEventListener(<span class="s">'click'</span>, <span class="k">function</span> () {</span><span class="ln">  <span class="k">if</span> (!LoggedIn) {</span><span class="ln net">    doLogin();<span class="note">← SERVER: leaves for PolyU SSO</span></span><span class="ln">  } <span class="k">else</span> {</span><span class="ln net">    logout();<span class="note">← SERVER: leaves to end the session</span></span><span class="ln hl">    LoggedIn = <span class="k">false</span>;</span><span class="ln">    loggedOutStatus();</span><span class="ln">    refreshLoginDependentButtons();</span><span class="ln">  }</span><span class="ln">});</span></pre></div>
+<div class="explain"><p><code>addEventListener('click', ...)</code> means "when this button is clicked, run this function". <code>LoggedIn</code> is a plain true/false variable in the browser. It is only used to decide what to <i>show</i>. It is not what protects the server (the cookie is).</p></div>
+
+<h3><code>startSession()</code> <span class="tag file">main.js:180</span></h3>
+<div class="codewrap"><div class="codehead"><span>main.js</span><span>runs on every page load</span></div><pre><span class="ln"><span class="k">async function</span> startSession() {</span><span class="ln">  <span class="k">let</span> session;</span><span class="ln">  <span class="k">try</span> {</span><span class="ln net hl">    session = <span class="k">await</span> getSession();<span class="note">← SERVER 1: "am I logged in?"</span></span><span class="ln">  } <span class="k">catch</span> (err) { console.error(<span class="s">'Session check failed'</span>, err); <span class="k">return</span>; }</span><span class="ln hl">  <span class="k">if</span> (!session.loggedIn) <span class="k">return</span>;<span class="note y">← stop here if not logged in</span></span><span class="ln"> </span><span class="ln">  LoggedIn = <span class="k">true</span>;</span><span class="ln">  loggedinStatus(session.userId);       <span class="c">// shows the student ID in the header</span></span><span class="ln">  refreshLoginDependentButtons();</span><span class="ln">  <span class="k">try</span> {</span><span class="ln net">    <span class="k">await</span> bkLoadBookings();<span class="note">← SERVER 2: load "my bookings" (GET MyBooking.php)</span></span><span class="ln">  } <span class="k">catch</span> (err) { console.error(<span class="s">'Could not load bookings'</span>, err); }</span><span class="ln">  refreshLoginDependentButtons();</span><span class="ln net">  setTrainingBadges(<span class="k">await</span> getTrainingStatus());<span class="note">← SERVER 3: training check (GET printerStatus.php)</span></span><span class="ln">}</span></pre></div>
+<div class="explain"><p>After SSO sends you back to the site, this is what notices you are logged in. It makes three server calls in order: session, bookings, training. A failure in any of them is logged to the console but doesn't break the page.</p></div>
+
+<h3><code>setTrainingBadges(status)</code> <span class="tag file">main.js:209</span></h3>
+<div class="codewrap"><div class="codehead"><span>main.js</span><span>where the badges are drawn</span></div><pre><span class="ln"><span class="k">function</span> setTrainingBadges(status) {</span><span class="ln">  Object.entries(status).forEach(([id, passed]) =&gt; {</span><span class="ln hl">    <span class="k">const</span> badge = document.querySelector(<span class="s">`#${id} .badge-training`</span>);<span class="note y">← finds the badge inside the machine section named <i>id</i></span></span><span class="ln">    <span class="k">if</span> (!badge) <span class="k">return</span>;</span><span class="ln hl">    badge.textContent = passed ? <span class="s">'Training Passed ✓'</span> : <span class="s">'Training Required ✗'</span>;</span><span class="ln">    badge.classList.remove(<span class="s">'passed'</span>, <span class="s">'notpass'</span>);</span><span class="ln">    badge.classList.add(passed ? <span class="s">'passed'</span> : <span class="s">'notpass'</span>);</span><span class="ln">  });</span><span class="ln">}</span></pre></div>
+<div class="explain">
+<p>It only changes text and colour. <b>This badge is cosmetic.</b> Hiding or editing it in DevTools does not let anyone book, because <code>MyBooking.php</code> re-checks training on every POST. The real data lives in the database table <code>3d_print_training_record</code>. The keys of <code>status</code> are HTML ids (<code>printer</code>); only <code>printer</code> exists in real mode today.</p></div>
+
+<h3>Other things in main.js, briefly</h3>
+<dl>
+<dt><code>machineTrainingData</code> (line 8), <code>machineDetailData</code> (line 291)</dt><dd>Hardcoded text, photos and specs for each machine. Edit these to change the popup content.</dd>
+<dt><code>openMachinePopup</code> / <code>renderMachinePopup</code> / <code>closeMachinePopup</code></dt><dd>Opens the machine detail popup and fills it from <code>machineDetailData</code>. <code>isMobileDevice()</code> picks the desktop or phone version.</dd>
+<dt><code>goToSlide</code>, <code>updateSideNav</code>, scroll handlers</dt><dd>Carousel and side-navigation behaviour inside the popup. Pure visuals, no server.</dd>
+<dt><code>#mpopup-booknow</code> click (line 774)</dt><dd>The "Book now" button: if logged in, calls <code>openBookingFlow()</code> in booking.js; otherwise prompts to log in.</dd>
+<dt><code>bkpMakeDragHandle</code> and friends</dt><dd>Drag-down-to-dismiss on the phone bottom sheets.</dd>
+</dl>
+
+<!-- ============ 6 ============ -->
+<h2 id="bookingjs">6 · <code>booking.js</code>, the booking flow</h2>
+<p>Holds the booking screens and the ticket. About half of it is drawing (calendar, week strip, slot buttons), which is long but simple. The parts that matter are the ones that touch the server and the shared state.</p>
+
+<h3>State: what the page remembers <span class="tag file">booking.js:112</span></h3>
+<div class="codewrap"><div class="codehead"><span>booking.js</span><span>the page's memory</span></div><pre><span class="ln"><span class="k">const</span> bkState = {</span><span class="ln">  machine: <span class="s">'bambu'</span>,</span><span class="ln">  date: <span class="k">null</span>,</span><span class="ln">  slots: [],              <span class="c">// timeslot IDs picked on `date`</span></span><span class="ln hl">  bookings: [],           <span class="c">// all of my upcoming bookings (comes from the server)</span></span><span class="ln">  lastBooked: <span class="k">null</span>,</span><span class="ln">  heroIndex: 0,</span><span class="ln">};</span><span class="ln hl"><span class="k">let</span> bkBusy = <span class="k">false</span>;<span class="note y">← a lock so double-clicks don't send two requests</span></span></pre></div>
+<div class="explain"><p><code>bkState.bookings</code> is just a cached copy of what the server said. After every booking or cancel, the code re-fetches it rather than editing it by hand, so the screen can't drift from the database.</p></div>
+
+<h3><code>bkLoadAvailability</code> and <code>openBookingFlow</code> <span class="tag file">booking.js:132, 143</span></h3>
+<div class="codewrap"><div class="codehead"><span>booking.js</span><span>opening the booking screen</span></div><pre><span class="ln"><span class="k">async function</span> bkLoadAvailability(machine) {</span><span class="ln net">  <span class="k">const</span> data = <span class="k">await</span> getAvailability();<span class="note">← SERVER: GET printerStatus.php</span></span><span class="ln hl">  <span class="k">const</span> printer = data.printers.find(p =&gt; machine.printerType.test(p.type));<span class="note y">← match "Bambu X1 Carbon" by pattern /bambu/i</span></span><span class="ln">  <span class="k">if</span> (!printer) <span class="k">throw new</span> ApiError(<span class="s">`${machine.name} is not open for booking right now.`</span>);</span><span class="ln">  bkAvail = { printerType: printer.type, sessions: printer.sessions,</span><span class="ln">              dates: [...<span class="k">new</span> Set(printer.sessions.map(s =&gt; s.date))].sort() };</span><span class="ln">}</span><span class="ln"> </span><span class="ln"><span class="k">async function</span> openBookingFlow(machineKey) {</span><span class="ln">  <span class="k">const</span> machine = bkMachineData[machineKey];</span><span class="ln hl">  <span class="k">if</span> (!machine || bkBusy) <span class="k">return</span>;</span><span class="ln">  bkBusy = <span class="k">true</span>;</span><span class="ln">  <span class="k">try</span> { <span class="k">await</span> bkLoadAvailability(machine); }</span><span class="ln">  <span class="k">catch</span> (err) {</span><span class="ln">    closeMachinePopup();</span><span class="ln hl">    <span class="k">if</span> (err.message === NOT_TRAINED) openTrainingModal(<span class="s">'printer'</span>);<span class="note y">← untrained users get the training popup</span></span><span class="ln">    <span class="k">else</span> alert(err.message);</span><span class="ln">    <span class="k">return</span>;</span><span class="ln">  } <span class="k">finally</span> { bkBusy = <span class="k">false</span>; }</span><span class="ln">  ...                                          <span class="c">// then opens the calendar / week strip</span></span><span class="ln">}</span></pre></div>
+<div class="explain"><p>The names <code>bkMachineData</code> (line 8) maps each machine to a regex like <code>/bambu/i</code>. The database printer name must match this pattern, or you get "not open for booking". Check this during deployment.</p></div>
+
+<h3>Making a booking <span class="tag file">booking.js:370, 379</span></h3>
+<div class="codewrap"><div class="codehead"><span>booking.js</span><span>submit</span></div><pre><span class="ln"><span class="k">async function</span> bkSubmitSelection() {</span><span class="ln">  <span class="k">const</span> slots = bkSelectedSlots();                  <span class="c">// the sessions the user ticked (max 3)</span></span><span class="ln">  <span class="k">const</span> date = bkYmd(bkState.date);                <span class="c">// e.g. "2026-11-24"</span></span><span class="ln net hl">  <span class="k">await</span> createBookings(slots.map(s =&gt; ({ date, slotId: s.id, printerType: bkAvail.printerType })));<span class="note">← SERVER: POST, inserts rows</span></span><span class="ln net">  <span class="k">await</span> bkRefreshBookings();<span class="note">← SERVER: GET, reload my bookings</span></span><span class="ln">  bkState.lastBooked = bkState.bookings.find(...) || <span class="k">null</span>;</span><span class="ln">}</span><span class="ln"> </span><span class="ln"><span class="k">async function</span> bkConfirmBooking() {</span><span class="ln hl">  <span class="k">if</span> (!bkSafetyChecked || bkBusy) <span class="k">return</span>;<span class="note y">← must tick the safety box; blocks double-submit</span></span><span class="ln">  bkBusy = <span class="k">true</span>;</span><span class="ln">  <span class="k">try</span> { <span class="k">await</span> bkSubmitSelection(); }</span><span class="ln hl">  <span class="k">catch</span> (err) { alert(err.message); <span class="k">return</span>; }<span class="note y">← server's refusal text shown to the user</span></span><span class="ln">  <span class="k">finally</span> { bkBusy = <span class="k">false</span>; }</span><span class="ln">  bkCloseConfirm();  bkOpenInfo(<span class="s">'a'</span>);      <span class="c">// success: show the "booked!" wizard</span></span><span class="ln">}</span></pre></div>
+<div class="explain"><p>The "max 3 sessions" and "tick the safety box" rules exist <b>only here in the browser</b>. See finding M2: the server doesn't enforce the cap of 3.</p></div>
+
+<h3>Loading and cancelling <span class="tag file">booking.js:350, 617</span></h3>
+<div class="codewrap"><div class="codehead"><span>booking.js</span><span>refresh and cancel</span></div><pre><span class="ln"><span class="k">async function</span> bkRefreshBookings() {</span><span class="ln net">  <span class="k">const</span> rows = <span class="k">await</span> listBookings();<span class="note">← SERVER: GET MyBooking.php</span></span><span class="ln hl">  bkState.bookings = rows.filter(r =&gt; (r.status === 0 || r.status === 1) &amp;&amp; r.date &gt;= today)</span><span class="ln">    .sort(...).map(r =&gt; ({ id: r.id, machine: ..., date: bkParseYmd(r.date), label: r.label, canCancel: r.canCancel }));</span><span class="ln">}</span><span class="ln"> </span><span class="ln"><span class="k">async function</span> tkConfirmCancel() {</span><span class="ln">  <span class="k">const</span> b = bkState.bookings[tkIndex];</span><span class="ln">  <span class="k">if</span> (!b || bkBusy) <span class="k">return</span>;</span><span class="ln">  <span class="k">try</span> {</span><span class="ln net hl">    <span class="k">await</span> cancelBooking(b.id);<span class="note">← SERVER: DELETE, sets status = 2</span></span><span class="ln net">    <span class="k">await</span> bkRefreshBookings();<span class="note">← SERVER: GET</span></span><span class="ln">  } <span class="k">catch</span> (err) { alert(err.message); <span class="k">return</span>; }</span><span class="ln">  ...                                   <span class="c">// then redraws the tabs and hero ticket</span></span><span class="ln">}</span></pre></div>
+<div class="explain"><p><b>Status codes</b> in <code>3d_print_booking_record.status</code>: <code>0</code> = active, <code>2</code> = cancelled. The server also counts <code>1</code> as occupying a slot; I couldn't find what <code>1</code> means in the code I read, so ask whoever built the backend.</p></div>
+
+<h3>Logout cleanup <span class="tag file">booking.js:648</span></h3>
+<p><code>bkOnLogout()</code> wipes <code>bkState.bookings</code>, closes every popup and clears the ticket HTML, so the next person on a shared computer doesn't see your bookings. No server call.</p>
+
+<h3>The ticket and rendering helpers</h3>
+<dl>
+<dt><code>bkTicketSlideHTML</code>, <code>bkRenderHeroTicket</code>, <code>tkRenderTabs</code>, <code>tkRenderDetail</code></dt><dd>Build the ticket HTML as text and drop it into the page with <code>innerHTML</code>. This is where escaping matters (see security finding L2).</dd>
+<dt><code>bkEsc(s)</code> <span class="tag file">line 38</span></dt><dd>Converts <code>&lt; &gt; &amp; " '</code> into harmless text so strings can't turn into HTML. Used on the printer name, session labels and status text.</dd>
+<dt><code>bkToday</code>, <code>bkAddDays</code>, <code>bkYmd</code>, <code>bkParseYmd</code>, <code>bkIsWeekend</code>, <code>bkMonday</code>, <code>bkIsoWeek</code></dt><dd>Small date helpers. <code>bkYmd</code> turns a date into the <code>"2026-11-24"</code> text the server uses.</dd>
+<dt><code>bkSlotHours</code>, <code>bkSlotStart</code>, <code>bkSectionText</code>, <code>bkWhenLabel</code></dt><dd>Turn a label like <code>"08:30 - 12:30"</code> into "4 Hours", "Morning" or "This Wednesday".</dd>
+<dt><code>bkRenderWeek</code>, <code>bkRenderCalendar</code>, <code>bkRenderSlotButtons</code>, <code>bkToggleSlot</code></dt><dd>Draw the week strip, month calendar and session buttons from <code>bkAvail</code>. <code>bkToggleSlot</code> enforces "max 3 selection".</dd>
+<dt><code>bkp…</code> (lines 678 to 1047)</dt><dd>The phone versions of everything above, with the same server calls (<code>bkpSubmitBooking</code>, <code>bkpConfirmCancel</code>).</dd>
+</dl>
+
+<!-- ============ 7 ============ -->
+<h2 id="php">7 · The PHP backend</h2>
+<p>PHP code runs on the server each time a request arrives. It runs top to bottom, then whatever it <code>echo</code>s is sent back. The five files that matter, in the order a request hits them:</p>
+
+<ol class="steps">
+<li class="srv"><b><code>authorization.php</code>: who are you?</b> Reads the <code>access_token</code> cookie, verifies the signature and expiry with PolyU's ADFS login service, and sets <code>$user_id</code> (staff number, or NetID). Bad or missing token → HTTP 401 and stop.</li>
+<li class="srv"><b><code>db_connect.php</code>: open the database.</b> Reads host, user, password and name from <code>.env</code> and connects with <code>mysqli</code>.</li>
+<li class="srv"><b><code>general_function.php</code>: shared helpers.</b> <code>CheckUserTrained()</code>, <code>GetAllowDate()</code>, <code>GetTimeslot()</code>, <code>GetPrinterInfo()</code>, <code>HandleError()</code> and so on.</li>
+<li class="srv"><b><code>printerStatus.php</code>: read-only availability.</b> GET only. Loops printers × dates × sessions and marks each Available / Full / Unavailable.</li>
+<li class="srv"><b><code>MyBooking.php</code>: the main one.</b> One file, three behaviours chosen by HTTP method: GET lists, POST creates, DELETE cancels.</li>
+</ol>
+
+<h3>The training check <span class="tag file">general_function.php:230</span></h3>
+<div class="codewrap"><div class="codehead"><span>general_function.php</span><span>CheckUserTrained</span></div><pre><span class="ln"><span class="k">function</span> CheckUserTrained() {</span><span class="ln">    <span class="k">global</span> $conn, $user_id;</span><span class="ln hl">    $sql = <span class="s">"SELECT EXISTS(SELECT 1 FROM `3d_print_training_record` WHERE user_id = ? AND trained &gt;= 1) AS 'trained'"</span>;</span><span class="ln">    $stmt = $conn-&gt;prepare($sql);</span><span class="ln hl">    $stmt-&gt;bind_param(<span class="s">"s"</span>, $user_id);<span class="note y">← the "?" is filled safely; this is what stops SQL injection</span></span><span class="ln">    $stmt-&gt;execute();</span><span class="ln">    $row = $stmt-&gt;get_result()-&gt;fetch_assoc();</span><span class="ln hl">    <span class="k">if</span> ($row[<span class="s">'trained'</span>] !== 1) {</span><span class="ln hl">        HandleError([<span class="s">'Status'</span> =&gt; <span class="s">'Error'</span>, <span class="s">'Message'</span> =&gt; <span class="s">"Not Trained User"</span>], 401);<span class="note y">← the exact text api.js looks for</span></span><span class="ln">    }</span><span class="ln">}</span></pre></div>
+<div class="explain"><p>Anyone not in <code>3d_print_training_record</code> with <code>trained &gt;= 1</code> gets a 401 here. It's called at the top of <code>printerStatus.php</code> and in the POST branch of <code>MyBooking.php</code>. That's the real gate.</p></div>
+
+<h3><code>MyBooking.php</code> POST, creating a booking</h3>
+<div class="codewrap"><div class="codehead"><span>MyBooking.php</span><span>case 'POST' (shortened)</span></div><pre><span class="ln"><span class="k">case</span> <span class="s">'POST'</span>:</span><span class="ln">    $raw = file_get_contents(<span class="s">'php://input'</span>);<span class="note y">← the JSON body sent by api.js</span></span><span class="ln hl">    CheckUserTrained();                       <span class="c">// 1. trained?</span></span><span class="ln">    $payload = json_decode($raw, <span class="k">true</span>);</span><span class="ln hl">    <span class="k">if</span> (json_last_error() !== JSON_ERROR_NONE || !isset($payload[<span class="s">'New Booking'</span>])...) { HandleError(..., 400); }  <span class="c">// 2. valid shape?</span></span><span class="ln">    <span class="k">foreach</span> (...) { validateDate($service_date) ... }   <span class="c">// 3. real dates?</span></span><span class="ln">    GetAllowDate(); GetTimeslot(); GetReservedPrinter(); GetPrinterInfo();</span><span class="ln">    <span class="k">foreach</span> (...) {</span><span class="ln">        in_array($service_date, $AllowDate)                      <span class="c">// 4. date is bookable</span></span><span class="ln">        validateBookingTimeslot(...) / GetTodayPassedSession(...) <span class="c">// 5. session exists and hasn't ended</span></span><span class="ln">        in_array($printer_type, $printer_types)                  <span class="c">// 6. printer exists</span></span><span class="ln">        isDuplicateInPayload(...) / isDuplicateInDatabase(...)   <span class="c">// 7. not already booked</span></span><span class="ln">    }</span><span class="ln hl">    <span class="k">foreach</span> (...) { <span class="k">if</span> (isSessionFull(...)) ... }        <span class="c">// 8. is there still a free printer?</span></span><span class="ln net hl">    <span class="k">foreach</span> (...) {  insertBooking(..., $uuid);  sendEmail(...); }<span class="note">← DATABASE WRITE + email</span></span><span class="ln">    echo json_encode([<span class="s">'Status'</span> =&gt; <span class="s">'Success'</span>, <span class="s">'Message'</span> =&gt; <span class="s">"New Booking Added"</span>]);</span></pre></div>
+<div class="explain"><p>This is why the front-end checks are only for convenience: steps 1 to 8 all happen again on the server. The ID is made server-side: <code>"CXC-3DP-" . uuid()</code>.</p></div>
+
+<h3>GET and DELETE</h3>
+<ul>
+<li><b>GET</b> selects this user's rows from <code>3d_print_booking_record</code> (<code>WHERE user_id = ?</code>, from the day before today onward), then adds <code>service_timeslot_display</code> and <code>cancel_booking_allow</code> (1 only if the session hasn't ended and status is 0).</li>
+<li><b>DELETE</b> validates the JSON, rejects duplicate IDs, then <code>checkDeleteBookingExist()</code> confirms the booking belongs to <i>this</i> user, is status 0, and the session hasn't ended. Then <code>deleteBooking()</code> does <code>UPDATE ... SET status = 2</code> (a soft delete: the row stays) and sends a cancellation email.</li>
+</ul>
+
+<h3><code>server/session.php</code> (the file you wrote) <span class="tag file">31 lines</span></h3>
+<div class="codewrap"><div class="codehead"><span>server/session.php</span><span>the whole logic</span></div><pre><span class="ln">session_start();</span><span class="ln hl"><span class="k">if</span> (!isset($_SESSION[<span class="s">'id_token'</span>])) {  echo json_encode([<span class="s">'logged_in'</span> =&gt; <span class="k">false</span>]);  exit(); }<span class="note y">← no SSO session at all → logged out</span></span><span class="ln">ob_start();</span><span class="ln hl"><span class="k">require</span> .../polyusso/authentication.php;  <span class="k">require</span> __DIR__ . <span class="s">'/authorization.php'</span>;<span class="note y">← reuse the real token check</span></span><span class="ln">ob_end_clean();</span><span class="ln">echo json_encode([<span class="s">'logged_in'</span> =&gt; <span class="k">true</span>, <span class="s">'user_id'</span> =&gt; $user_id, <span class="s">'user_email'</span> =&gt; $user_email]);</span></pre></div>
+<div class="explain"><p>The old PHP pages stored the user's email in the PHP session on every page load, and <code>MyBooking.php</code> needs it for confirmation emails. The new static front end never loads those pages, so calling this endpoint on load is what keeps that working.</p></div>
+
+<h3>Tables I could identify</h3>
+<div class="tablewrap"><table>
+<tr><th>Table</th><th>Holds</th></tr>
+<tr><td><code>3d_print_training_record</code></td><td><code>user_id</code>, <code>trained</code> (level). <b>This is where the training badge comes from.</b></td></tr>
+<tr><td><code>3d_print_booking_record</code></td><td>One row per booked session: <code>booking_id</code>, <code>user_id</code>, <code>user_email</code>, <code>user_department</code>, <code>service_date</code>, <code>service_timeslot_id</code>, <code>printer_type</code>, <code>status</code>, <code>booking_timestamp</code></td></tr>
+<tr><td><code>3d_print_timeslot</code></td><td>Session definitions: <code>start_time</code>, <code>end_time</code>, <code>available_from</code>, <code>available_to</code></td></tr>
+<tr><td><code>3d_printer_booking_quantity</code></td><td>Printer types and how many of each exist (<code>quantity</code>)</td></tr>
+<tr><td>(reserved printers table)</td><td>Blocks of printers held back for a date range and timeslot. I saw it read by <code>GetReservedPrinter()</code> but not its name.</td></tr>
+</table></div>
+
+<!-- ============ 8 ============ -->
+<h2 id="journey">8 · One booking, start to end</h2>
+<ol class="steps">
+<li>You open the site. <code>main.js</code> runs <code>startSession()</code>.</li>
+<li class="srv"><b>Server:</b> <code>GET api/session.php</code> → <code>{logged_in:false}</code>. Header shows "Login".</li>
+<li>You click Login. <code>login()</code> sends the whole browser to <code>/ic/iemakerlab/booking/</code>, which redirects to PolyU SSO.</li>
+<li class="srv"><b>Server:</b> you sign in on the PolyU page. <code>polyusso/callback.php</code> swaps the code for tokens and sets the <code>access_token</code> cookie (HttpOnly, Secure), then redirects to <code>SSO_LANDING_PAGE</code>.</li>
+<li>The page loads again. <code>startSession()</code> now gets <code>logged_in:true</code>, loads your bookings, checks training, draws the badges.</li>
+<li>You click a machine, then Book now. <code>openBookingFlow()</code> → <code>bkLoadAvailability()</code>.</li>
+<li class="srv"><b>Server:</b> <code>GET printerStatus.php</code>. If untrained → 401 "Not Trained User" → training popup. Otherwise dates and sessions come back and the week strip is drawn.</li>
+<li>You pick a date and up to 3 sessions, tick the safety box, press Confirm. <code>bkConfirmBooking()</code> runs.</li>
+<li class="srv"><b>Server:</b> <code>POST MyBooking.php</code> with <code>{"New Booking":[{service_date, service_timeslot_id, printer_type}]}</code>. PHP runs the 8 checks, inserts rows, sends the email, replies "New Booking Added".</li>
+<li class="srv"><b>Server:</b> <code>GET MyBooking.php</code> to reload. The ticket appears in the hero section.</li>
+<li class="srv"><b>Server:</b> Cancel → <code>DELETE MyBooking.php</code> with the booking ID → status 2, email sent, list reloaded.</li>
+</ol>
+
+<!-- ============ 9 ============ -->
+<h2 id="security">9 · Security considerations</h2>
+<p>I read the front end and the PHP files in <code>iemakerlab/booking/</code>. I did not test against a live server or attack anything, so these come from reading the code. Severity is my judgement of the risk once the site is live.</p>
+
+<h3>What is already done well</h3>
+<ul class="good">
+<li><b>Identity comes from the token, never from the request.</b> The browser never sends a user ID, so you can't ask for someone else's bookings by changing a number.</li>
+<li><b>Ownership is checked on cancel.</b> <code>checkDeleteBookingExist</code> and <code>deleteBooking</code> both include <code>AND user_id = ?</code>, so guessing a booking ID gets you "not found".</li>
+<li><b>SQL is mostly parameterised.</b> <code>prepare()</code> + <code>bind_param()</code> keeps user input out of the SQL text (one exception, M3).</li>
+<li><b>Training and booking rules are enforced on the server.</b> Editing the front end can't skip them.</li>
+<li><b>The login cookie is <code>HttpOnly</code> and <code>Secure</code>.</b> JavaScript on the page can't read it, and it's only sent over HTTPS.</li>
+<li><b>Secrets stay out of git.</b> <code>iemakerlab/</code> is in <code>.gitignore</code>, and <code>.htaccess</code> denies web access to <code>.env</code>, <code>db_connect.php</code>, <code>authorization.php</code> and other internals.</li>
+<li><b>Output escaping exists.</b> <code>bkEsc()</code> is used when server text goes into <code>innerHTML</code>, and error text goes into <code>alert()</code>, which is plain text.</li>
+<li><b>Cancelled bookings are soft-deleted</b>, so there's an audit trail.</li>
+</ul>
+
+<div class="callout"><b>Status: fixed in code.</b> H1, M1, M2, M3, L1 and L3 have been changed (see the notes under each). They are changed in your local <code>iemakerlab/</code> copy and in this repo, <b>not on the PolyU server yet</b>. The backend files must be handed to the server owner. M2 caps each request at 3 sessions; a per-user total cap is a policy decision I left alone. L2 and L4 need no code change.</div>
+<h3>Findings, most important first</h3>
+
+<div class="finding hi">
+<h4><span class="tag hi">HIGH</span> H1 · Cross-site request forgery on book and cancel</h4>
+<p><b>What:</b> The login cookie is set with <code>SameSite=None</code> (<code>callback.php</code>), which means the browser sends it even when the request starts from another website. <code>MyBooking.php</code> reads the body with <code>file_get_contents('php://input')</code> and <code>json_decode</code>s it without checking the <code>Content-Type</code> header, and it has no CSRF token.</p>
+<p><b>Attack:</b> A malicious page can make a logged-in student's browser send a <code>text/plain</code> POST containing the JSON. That kind of request needs no CORS permission, so no browser block applies, and the cookie rides along. Result: bookings made or cancelled without the student knowing.</p>
+<p class="fix"><b>Fix (backend):</b> in <code>MyBooking.php</code> reject any POST/DELETE whose <code>Content-Type</code> isn't <code>application/json</code> (this forces a CORS preflight that other sites fail), and/or check that the <code>Origin</code> header is <code>https://www.polyu.edu.hk</code>. Also ask whether the <code>access_token</code> cookie really needs <code>SameSite=None</code>; <code>Lax</code> would block this attack outright, and since your front end is same-origin it should work.</p>
+</div>
+
+<div class="finding med">
+<h4><span class="tag med">MEDIUM</span> M1 · Two people can take the last printer at the same time</h4>
+<p><b>What:</b> POST checks <code>isSessionFull()</code> in one step, then inserts in a later step, with no database transaction or lock between them. Two requests arriving together both see "1 slot left", and both insert.</p>
+<p class="fix"><b>Fix (backend):</b> wrap the check and insert in a transaction using <code>SELECT ... FOR UPDATE</code> on the relevant rows, or add a database-level constraint.</p>
+</div>
+
+<div class="finding med">
+<h4><span class="tag med">MEDIUM</span> M2 · "Max 3 sessions" is only enforced in the browser</h4>
+<p><b>What:</b> The README says so too: it's a front-end rule. The server loops over every item in <code>New Booking</code> with no count limit. Anyone using a script or DevTools can post dozens of items, and there's no rate limit, so one trained user could hold many sessions.</p>
+<p class="fix"><b>Fix (backend):</b> reject payloads over 3 items, and count the user's existing active bookings per date/week against a cap.</p>
+</div>
+
+<div class="finding med">
+<h4><span class="tag med">MEDIUM</span> M3 · Internal error text is sent to the browser</h4>
+<p><b>What:</b> Many error paths return <code>$conn-&gt;error</code> or <code>$stmt-&gt;error</code> (raw MySQL messages), and <code>authorization.php</code> returns <code>error_detail =&gt; $e-&gt;getMessage()</code> for invalid tokens. The front end shows <code>Message</code> in an <code>alert()</code>, so users could see table or column names. That helps an attacker.</p>
+<p><b>Also:</b> <code>insertBooking()</code> puts <code>$booking_id</code> directly into the SQL string instead of binding it. It's safe today because the server generates it, but it breaks the "always bind" habit and would become injectable if the code ever changes.</p>
+<p class="fix"><b>Fix:</b> log the detail on the server, return a generic message. Bind <code>booking_id</code> like the other values.</p>
+</div>
+
+<div class="finding low">
+<h4><span class="tag low">LOW</span> L1 · <code>?mock</code> works on the live site</h4>
+<p><b>What:</b> <code>USE_MOCK</code> is true if the URL has <code>?mock</code>, even on <code>polyu.edu.hk</code>. It can't harm the server, because no request is sent. But someone could send a student a <code>?mock</code> link, let them "book" a session that only exists in their own browser, and they'd miss their real slot.</p>
+<p class="fix"><b>Fix:</b> only honour <code>?mock</code> when the hostname isn't <code>polyu.edu.hk</code>. One-line change in <code>api.js</code>.</p>
+</div>
+
+<div class="finding low">
+<h4><span class="tag low">LOW</span> L2 · Keep HTML escaping tight as the code grows</h4>
+<p><b>What:</b> <code>booking.js</code> builds HTML strings and assigns them via <code>innerHTML</code> in 13 places, <code>main.js</code> in 20. The server-supplied text I traced (printer name, session label, status) goes through <code>bkEsc()</code>, so I found no hole. But the front end is served from the <b>same origin</b> as the API with the login cookie, so any future XSS bug would let an attacker book and cancel as the victim.</p>
+<p class="fix"><b>Fix:</b> always pass server strings through <code>bkEsc()</code> (or use <code>textContent</code>) and consider adding a <code>Content-Security-Policy</code> header on the server.</p>
+</div>
+
+<div class="finding low">
+<h4><span class="tag low">LOW</span> L3 · <code>session.php</code> returns the user's email</h4>
+<p><b>What:</b> The response includes <code>user_email</code>, but <code>api.js</code> only uses <code>user_id</code>. Sending data nobody uses just widens what leaks if something else goes wrong.</p>
+<p class="fix"><b>Fix:</b> remove <code>user_email</code> from the JSON (keep it stored in the PHP session, which is what <code>MyBooking.php</code> needs).</p>
+</div>
+
+<div class="finding low">
+<h4><span class="tag low">LOW</span> L4 · Operational points</h4>
+<ul>
+<li><b>Handling credentials:</b> <code>iemakerlab/.env</code> holds the real database password. Don't zip, email or screenshot that folder, and never remove it from <code>.gitignore</code>. If it's ever shared, ask the owner to rotate the password.</li>
+<li><b>Database exposure:</b> the database server <code>158.132.152.154</code> should only accept connections from the web server. Ask the admin to confirm.</li>
+<li><b>No rate limiting</b> on any endpoint. A script could hammer <code>printerStatus.php</code>. A server-level limit would help.</li>
+<li><b>The <code>iemakerlab/internal/test</code> and <code>booking/test.php</code></b> files shouldn't be on a production server.</li>
+<li><b>Changing <code>SSO_LANDING_PAGE</code></b> redirects everyone using the old site. Agree it with the owner.</li>
+</ul>
+</div>
+
+<div class="callout"><b>If you only do three things:</b> (1) H1: require <code>Content-Type: application/json</code> and check <code>Origin</code> on POST/DELETE; (2) M2: cap <code>New Booking</code> at 3 server-side; (3) M3: stop returning raw database errors. All three are small edits to <code>MyBooking.php</code> and <code>authorization.php</code>, and you'd hand them to whoever owns the backend, since you can't test them without it.</div>
+
+<!-- ============ 10 ============ -->
+<h2 id="glossary">10 · Glossary</h2>
+<dl>
+<dt>API / endpoint</dt><dd>A URL a program (not a person) calls to get or change data. <code>printerStatus.php</code> is an endpoint.</dd>
+<dt>JSON</dt><dd>Text format for data, like <code>{"Status":"Success"}</code>. What the front end and PHP use to talk to each other.</dd>
+<dt>HTTP methods</dt><dd>GET reads, POST creates, DELETE removes. Codes: 200 ok, 400 you asked wrong, 401 not logged in or not allowed, 405 wrong method, 500 server broke.</dd>
+<dt>Cookie</dt><dd>A small value the server asks the browser to store and send back on every request. <code>access_token</code> is your login proof.</dd>
+<dt>SSO</dt><dd>Single sign-on. You log in once on PolyU's official page and the site trusts that.</dd>
+<dt>Token / JWT</dt><dd>A signed note from the login system saying who you are and until when. PHP verifies the signature.</dd>
+<dt>SQL / prepared statement</dt><dd>The language for asking the database things. A prepared statement uses <code>?</code> placeholders so user input can't be run as SQL.</dd>
+<dt>CSRF</dt><dd>Another website tricking your browser into sending a request to this site, using your cookie.</dd>
+<dt>XSS</dt><dd>Getting a page to run attacker-written JavaScript, usually via unescaped text placed in HTML.</dd>
+<dt>Same origin</dt><dd>Same protocol, domain and port. The front end must be on <code>www.polyu.edu.hk</code> for the cookie to work.</dd>
+<dt>Mock</dt><dd>A fake stand-in for the real server, for testing.</dd>
+<dt><code>localStorage</code></dt><dd>A small per-site notepad inside the browser. Only the mock uses it.</dd>
+</dl>
+
+<footer>Generated from the code at commit 66b980c on the <code>popup</code> branch. Line numbers refer to that commit and will drift as files change.</footer>
+</main>
+</div>
+</body>
+</html>

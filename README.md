@@ -13,7 +13,7 @@ npx serve .
 python -m http.server 8000
 ```
 
-Anywhere other than `*.polyu.edu.hk` (or with `?mock` in the URL), `api.js` uses a
+Anywhere other than `*.polyu.edu.hk`, `api.js` uses a
 built-in mock backend instead of the real API: login is instant (user `2502838D`),
 there are two printers and three sessions a day, and bookings persist in
 `localStorage`. Clear site data to reset it.
